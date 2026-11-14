@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CropGuard AI | Apollo 3 - NASA Space Apps</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Leaflet Harita CSS CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  
+  <!-- 1. DEĞİŞİKLİK: Parçalanmış 3 CSS Dosyası -->
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/map.css" />
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-emerald-500/30 selection:text-emerald-200">
+
+  <!-- Üst Telemetri & Takım Barı -->
+  <header class="border-b border-slate-800/80 bg-slate-900/70 backdrop-blur-md sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/40 flex items-center justify-center relative">
+          <span class="pulse-dot"></span>
+          <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-bold text-lg tracking-tight text-white">CropGuard <span class="text-emerald-400">AI</span></h1>
+            <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">APOLLO 3</span>
+          </div>
+          <p class="text-xs text-slate-400 hidden sm:block">İklim Anomalilerine Karşı Dinamik Ekim & Rotasyon Optimizasyonu</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 text-xs font-mono">
+        <span id="header-coords" class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900 border border-slate-700 text-slate-300">
+          📍 37.87°K, 32.49°D
+        </span>
+        <span class="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-950/60 border border-emerald-800/60 text-emerald-300">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          NASA POWER HAZIR
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Ana Çalışma Alanı -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+    <!-- SOL PANEL: KONUM, HARİTA & TARLA BİLGİ EKRANI (4 Kolon) -->
+    <section class="lg:col-span-4 flex flex-col gap-4 lg:sticky lg:top-20">
+      <div class="glass-panel rounded-2xl p-5 flex flex-col gap-4">
+
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center text-slate-950 font-bold text-sm">
+              🛰️
+            </div>
+            <div>
+              <h2 class="font-semibold text-sm text-white">Konum & Tarla Profili</h2>
+              <p class="text-xs text-emerald-400">Parsel, toprak ve imkân bilgileri</p>
+            </div>
+          </div>
+          <span class="text-[11px] font-mono text-slate-400">GİRDİ</span>
+        </div>
+
+        <form id="advisor-form" class="flex flex-col gap-4">
+
+          <!-- BÖLÜM 1: HARİTADAN BÖLGE VE KOORDİNAT SEÇİMİ -->
+          <div class="flex flex-col gap-2">
+            <div class="flex items-center justify-between">
+              <label class="text-xs font-semibold uppercase tracking-wider text-emerald-400">1. Tarla Konumu</label>
+              <span id="coord-badge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-900 border border-slate-700 text-emerald-300">
+                37.8746, 32.4932
+              </span>
+            </div>
+
+            <select id="region" name="region" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 transition">
+              <option value="konya" data-lat="37.8746" data-lng="32.4932">İç Anadolu — Konya Ovası</option>
+              <option value="cukurova" data-lat="36.9914" data-lng="35.3308">Akdeniz — Çukurova (Adana)</option>
+              <option value="ege" data-lat="37.8444" data-lng="27.8458">Ege — Büyük Menderes (Aydın)</option>
+              <option value="trakya" data-lat="41.6771" data-lng="26.5557">Marmara — Ergene / Trakya</option>
+              <option value="gap" data-lat="37.1674" data-lng="38.7955">Güneydoğu — Harran Ovası</option>
+              <option value="custom" data-lat="39.0000" data-lng="35.0000">Özel Koordinat (Haritadan Seçildi)</option>
+            </select>
+
+            <div class="relative rounded-xl overflow-hidden border border-slate-700/90 shadow-inner">
+              <div id="field-map" class="w-full h-40 z-10"></div>
+              <div class="bg-slate-900/95 px-2.5 py-1.5 border-t border-slate-800 flex items-center justify-between text-[10px] text-slate-400">
+                <span>💡 Haritaya tıklayarak pin bırakın</span>
+                <button type="button" id="locate-me-btn" class="text-emerald-400 hover:text-emerald-300 font-medium cursor-pointer">
+                  Konumumu Bul
+                </button>
+              </div>
+            </div>
+
+            <input type="hidden" id="lat-input" name="latitude" value="37.8746" />
+            <input type="hidden" id="lng-input" name="longitude" value="32.4932" />
+          </div>
+
+          <!-- BÖLÜM 2: TOPRAK BİLGİSİ -->
+          <div class="flex flex-col gap-2.5 border-t border-slate-800/80 pt-3.5">
+            <div class="flex items-center justify-between">
+              <label class="text-xs font-semibold uppercase tracking-wider text-emerald-400">2. Toprak Yapısı</label>
+              <span id="soil-risk-hint" class="text-[10px] text-emerald-400">Dengeli nem tutulumu</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-1.5">
+              <label class="cursor-pointer">
+                <input type="radio" name="soilType" value="tinli" class="sr-only peer" checked />
+                <div class="chip-box p-2 rounded-xl border border-slate-700 bg-slate-900/60 text-xs text-slate-300 peer-checked:border-emerald-500 peer-checked:bg-emerald-500/15 peer-checked:text-emerald-300">
+                  <div class="font-semibold text-[11px]">🟫 Tınlı Toprak</div>
+                  <div class="text-[9px] text-slate-400">İdeal drenaj</div>
+                </div>
+              </label>
+
+              <label class="cursor-pointer">
+                <input type="radio" name="soilType" value="killi" class="sr-only peer" />
+                <div class="chip-box p-2 rounded-xl border border-slate-700 bg-slate-900/60 text-xs text-slate-300 peer-checked:border-emerald-500 peer-checked:bg-emerald-500/15 peer-checked:text-emerald-300">
+                  <div class="font-semibold text-[11px]">🧱 Killi Toprak</div>
+                  <div class="text-[9px] text-slate-400">Yüksek nem tutar</div>
+                </div>
+              </label>
+
+              <label class="cursor-pointer">
+                <input type="radio" name="soilType" value="kumlu" class="sr-only peer" />
+                <div class="chip-box p-2 rounded-xl border border-slate-700 bg-slate-900/60 text-xs text-slate-300 peer-checked:border-emerald-500 peer-checked:bg-emerald-500/15 peer-checked:text-emerald-300">
+                  <div class="font-semibold text-[11px]">🏜️ Kumlu Toprak</div>
+                  <div class="text-[9px] text-slate-400">Hızlı kuruma</div>
+                </div>
+              </label>
+
+              <label class="cursor-pointer">
+                <input type="radio" name="soilType" value="kirecli" class="sr-only peer" />
+                <div class="chip-box p-2 rounded-xl border border-slate-700 bg-slate-900/60 text-xs text-slate-300 peer-checked:border-emerald-500 peer-checked:bg-emerald-500/15 peer-checked:text-emerald-300">
+                  <div class="font-semibold text-[11px]">🪨 Kireçli Toprak</div>
+                  <div class="text-[9px] text-slate-400">Yüksek pH eğilimi</div>
+                </div>
+              </label>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2.5">
+              <div>
+                <label for="soil-ph" class="block text-[11px] font-medium text-slate-400 mb-1">Toprak pH</label>
+                <select id="soil-ph" name="soilPh" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500 transition">
+                  <option value="notr" selected>Nötr (6.5–7.5)</option>
+                  <option value="asidik">Asidik (&lt; 6.5)</option>
+                  <option value="alkali">Alkali (&gt; 7.5)</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="field-area" class="block text-[11px] font-medium text-slate-400 mb-1">Alan (Dekar)</label>
+                <input
+                  type="number"
+                  id="field-area"
+                  name="fieldArea"
+                  min="1"
+                  max="50000"
+                  value="120"
+                  required
+                  class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs font-mono text-white focus:outline-none focus:border-emerald-500 transition"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- BÖLÜM 3: ÜRÜN, SULAMA VE BÜTÇE BİLGİSİ -->
+          <div class="flex flex-col gap-2.5 border-t border-slate-800/80 pt-3.5">
+            <label class="text-xs font-semibold uppercase tracking-wider text-emerald-400">3. Mevcut Ürün & İmkânlar</label>
+
+            <div class="grid grid-cols-2 gap-2.5">
+              <div>
+                <label for="target-crop" class="block text-[11px] font-medium text-slate-400 mb-1">Mevcut Ana Ürün</label>
+                <select id="target-crop" name="targetCrop" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500 transition">
+                  <option value="bugday">🌾 Ekmeklik Buğday</option>
+                  <option value="misir">🌽 Dane Mısır</option>
+                  <option value="domates">🍅 Salçalık Domates</option>
+                  <option value="aycicegi">🌻 Ayçiçeği</option>
+                  <option value="pamuk">☁️ Pamuk</option>
+                  <option value="seker_pancari">🌱 Şeker Pancarı</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="irrigation" class="block text-[11px] font-medium text-slate-400 mb-1">Sulama İmkânı</label>
+                <select id="irrigation" name="irrigation" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500 transition">
+                  <option value="damla_sulama" selected>💧 Damla Sulama</option>
+                  <option value="yagmurlama">🚿 Yağmurlama / Pivot</option>
+                  <option value="salma_sulama">🌊 Salma Sulama</option>
+                  <option value="kuru_tarim">🌧️ Kuru Tarım</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-medium text-slate-400 mb-1">Girdi & Tohum Bütçesi</label>
+              <div class="grid grid-cols-3 gap-1.5">
+                <label class="cursor-pointer">
+                  <input type="radio" name="budgetLevel" value="dusuk" class="sr-only peer" />
+                  <div class="chip-box text-center py-1.5 px-1.5 rounded-xl border border-slate-700 bg-slate-900/60 text-[11px] font-medium text-slate-300 peer-checked:border-emerald-500 peer-checked:bg-emerald-500/15 peer-checked:text-emerald-300">
+                    Ekonomik
+                  </div>
+                </label>
+                <label class="cursor-pointer">
+                  <input type="radio" name="budgetLevel" value="orta" class="sr-only peer" checked />
+                  <div class="chip-box text-center py-1.5 px-1.5 rounded-xl border border-slate-700 bg-slate-900/60 text-[11px] font-medium text-slate-300 peer-checked:border-emerald-500 peer-checked:bg-emerald-500/15 peer-checked:text-emerald-300">
+                    Dengeli
+                  </div>
+                </label>
+                <label class="cursor-pointer">
+                  <input type="radio" name="budgetLevel" value="yuksek" class="sr-only peer" />
+                  <div class="chip-box text-center py-1.5 px-1.5 rounded-xl border border-slate-700 bg-slate-900/60 text-[11px] font-medium text-slate-300 peer-checked:border-emerald-500 peer-checked:bg-emerald-500/15 peer-checked:text-emerald-300">
+                    Esnek / Hibrit
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-medium text-slate-400 mb-1">Makine Parkı</label>
+              <div class="flex flex-wrap gap-1.5">
+                <label class="cursor-pointer">
+                  <input type="checkbox" name="machinery" value="traktor" class="sr-only peer" checked />
+                  <span class="inline-block px-2.5 py-1 rounded-full text-[10px] border border-slate-700 bg-slate-900 text-slate-300 peer-checked:border-emerald-500 peer-checked:bg-emerald-500/20 peer-checked:text-emerald-300 transition">
+                    🚜 Traktör
+                  </span>
+                </label>
+                <label class="cursor-pointer">
+                  <input type="checkbox" name="machinery" value="mibzer" class="sr-only peer" checked />
+                  <span class="inline-block px-2.5 py-1 rounded-full text-[10px] border border-slate-700 bg-slate-900 text-slate-300 peer-checked:border-emerald-500 peer-checked:bg-emerald-500/20 peer-checked:text-emerald-300 transition">
+                    🌱 Hassas Mibzer
+                  </span>
+                </label>
+                <label class="cursor-pointer">
+                  <input type="checkbox" name="machinery" value="pulverizator" class="sr-only peer" />
+                  <span class="inline-block px-2.5 py-1 rounded-full text-[10px] border border-slate-700 bg-slate-900 text-slate-300 peer-checked:border-emerald-500 peer-checked:bg-emerald-500/20 peer-checked:text-emerald-300 transition">
+                    💨 Pülverizatör
+                  </span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            id="analyze-btn"
+            class="w-full py-2.5 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-[0.99] text-slate-950 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition shadow-lg shadow-emerald-500/20 cursor-pointer"
+          >
+            <span>İklim & Rotasyon Simülasyonunu Çalıştır</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- SAĞ PANEL: İKLİM ANALİZİ + ROTASYON KARŞILAŞTIRMA EKRANI (8 Kolon) -->
+    <section id="dashboard-section" class="lg:col-span-8 flex flex-col gap-5">
+
+      <!-- BAŞLANGIÇ BEKLEME EKRANI -->
+      <div id="empty-state" class="glass-panel rounded-2xl p-8 flex flex-col justify-center items-center text-center border-dashed border-slate-700/80 min-h-[560px]">
+        <div class="w-16 h-16 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center mb-4 text-emerald-400 shadow-lg shadow-emerald-500/10">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-white">İklim Telemetrisi & Rotasyon Motoru Hazır</h3>
+        <p class="text-sm text-slate-400 max-w-lg mt-2 leading-relaxed">
+          Sol panelden tarla konumunu, toprak yapısını ve mevcut ürününü gönderdiğinde; <span class="text-slate-200 font-medium">iklim risk grafikleri</span> ile birlikte <span class="text-emerald-400 font-medium">Mevcut Rotasyon + 2 Alternatif Stratejinin</span> verim, su tasarrufu ve hastalık koruma sonuçları karşılaştırmalı olarak üretilecek.
+        </p>
+        <button type="button" id="quick-demo-btn" class="mt-5 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-medium text-emerald-400 border border-slate-700 transition cursor-pointer">
+          ⚡ Varsayılan Konya / Buğday Verisiyle Simülasyonu Başlat
+        </button>
+      </div>
+
+      <!-- DİNAMİK DASHBOARD (Analiz Çalışınca Görünür) -->
+      <div id="climate-panel" class="hidden flex-col gap-5 animate-fade-in">
+
+        <!-- Üst Özet Telemetri Bandı -->
+        <div class="glass-panel rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 border-l-4 border-l-emerald-500">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-mono uppercase tracking-wider text-emerald-400">RAPOR & KARAR MOTORU</span>
+              <span id="report-coords" class="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-800">37.87°K, 32.49°D</span>
+            </div>
+            <h2 id="report-title" class="text-base font-bold text-white mt-0.5">Konya Ovası — Ekmeklik Buğday (Tınlı Toprak)</h2>
+          </div>
+          <div class="flex items-center gap-2 text-xs">
+            <span class="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700 text-slate-300">
+              Parsel: <strong id="report-area" class="text-white font-mono">120 da</strong>
+            </span>
+            <span class="px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 font-medium">
+              3 Strateji Simüle Edildi
+            </span>
+          </div>
+        </div>
+
+        <!-- 4 KRİTİK TARIM RİSKİ KARTI -->
+         <!-- GÖREV 5: ETKİLEŞİMLİ SİMÜLASYON PANELİ -->
+        <div id="simulation-panel-box" class="glass-panel rounded-2xl p-4 sm:p-5 border-t-2 border-t-amber-500/70"></div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="glass-panel rounded-xl p-3.5 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-medium text-slate-400">Mantar / Pas Riski</span>
+              <span class="text-sm">🍄</span>
+            </div>
+            <div class="my-1.5">
+              <div id="kpi-fungal-score" class="text-xl font-bold font-mono text-amber-400">%68</div>
+              <div id="kpi-fungal-label" class="text-[11px] font-medium text-amber-300/90">Yüksek Sporülasyon</div>
+            </div>
+            <p id="kpi-fungal-desc" class="text-[10px] text-slate-400 leading-snug">Bahar çiy + ılıman gece riski</p>
+          </div>
+
+          <div class="glass-panel rounded-xl p-3.5 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-medium text-slate-400">Kuraklık Stresi</span>
+              <span class="text-sm">☀️</span>
+            </div>
+            <div class="my-1.5">
+              <div id="kpi-drought-score" class="text-xl font-bold font-mono text-rose-400">%74</div>
+              <div id="kpi-drought-label" class="text-[11px] font-medium text-rose-300/90">Kritik Nem Açığı</div>
+            </div>
+            <p id="kpi-drought-desc" class="text-[10px] text-slate-400 leading-snug">Yaz yağışlarında anomali</p>
+          </div>
+
+          <div class="glass-panel rounded-xl p-3.5 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-medium text-slate-400">Geç İlkbahar Donu</span>
+              <span class="text-sm">❄️</span>
+            </div>
+            <div class="my-1.5">
+              <div id="kpi-frost-score" class="text-xl font-bold font-mono text-sky-400">%45</div>
+              <div id="kpi-frost-label" class="text-[11px] font-medium text-sky-300/90">Orta-Yüksek Risk</div>
+            </div>
+            <p id="kpi-frost-desc" class="text-[10px] text-slate-400 leading-snug">Yalancı bahar sonrası soğuma</p>
+          </div>
+
+          <div class="glass-panel rounded-xl p-3.5 flex flex-col justify-between border-rose-500/30 bg-rose-950/10">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-medium text-slate-400">Mevcut Verim Kaybı</span>
+              <span class="text-sm">📉</span>
+            </div>
+            <div class="my-1.5">
+              <div id="kpi-yield-loss" class="text-xl font-bold font-mono text-rose-400">-%24</div>
+              <div class="text-[11px] font-medium text-slate-300">Klasik Takvimle</div>
+            </div>
+            <p class="text-[10px] text-emerald-400 leading-snug">Alternatif rotasyonla kurtarılabilir</p>
+          </div>
+        </div>
+
+        <!-- ROTASYON KARŞILAŞTIRMA EKRANI (3 STRATEJİ) -->
+        <div class="glass-panel rounded-2xl p-5 flex flex-col gap-4 border-t-2 border-t-emerald-500/70">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-base">🔄</span>
+                <h3 class="text-sm font-bold text-white tracking-tight">Rotasyon Stratejileri Karşılaştırması</h3>
+              </div>
+              <p class="text-xs text-slate-400 mt-0.5">
+                Mevcut geleneksel plan ile tarlanıza özel optimize edilmiş <strong class="text-emerald-400 font-medium">2 alternatif rotasyon stratejisinin</strong> 3 sezonluk sonuçları:
+              </p>
+            </div>
+            <span class="text-[11px] font-mono px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700 text-slate-300">
+              Kartlara tıklayarak strateji seçin
+            </span>
+          </div>
+
+          <div id="rotation-cards-grid" class="grid grid-cols-1 md:grid-cols-3 gap-3.5"></div>
+          <div id="selected-strategy-detail" class="rounded-xl bg-slate-900/90 border border-slate-800 p-4 flex flex-col gap-3"></div>
+        </div>
+        <!-- YENİ NESİL EKİM TAKVİMİ (TIMELINE) -->
+         <!-- GÖREV 6: ÇİFTÇİ GÖREV TAKVİMİ & 15-30 GÜNLÜK HAVA TAHMİNİ -->
+        <div id="farmer-task-calendar-box" class="glass-panel rounded-2xl p-5 flex flex-col gap-4 border-t-2 border-t-purple-500/70"></div>
+        <div id="planting-timeline-box" class="glass-panel rounded-2xl p-5 flex flex-col gap-4 border-t-2 border-t-sky-500/70"></div>
+        <!-- GRAFİKLER BÖLÜMÜ -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="glass-panel rounded-2xl p-4 flex flex-col gap-3">
+            <div class="flex items-start justify-between">
+              <div>
+                <h3 class="text-xs font-semibold uppercase tracking-wider text-white">Aylık Yağış & Sıcaklık Trendi</h3>
+                <p class="text-[11px] text-slate-400">2026 Projeksiyonu vs. Tarihsel Normal</p>
+              </div>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/10 text-sky-300 border border-sky-500/30">mm / °C</span>
+            </div>
+            <div class="relative h-52 w-full">
+              <canvas id="tempRainChart"></canvas>
+            </div>
+          </div>
+
+          <div class="glass-panel rounded-2xl p-4 flex flex-col gap-3">
+            <div class="flex items-start justify-between">
+              <div>
+                <h3 class="text-xs font-semibold uppercase tracking-wider text-white">Kuraklık & Mantar Risk Endeksi</h3>
+                <p class="text-[11px] text-slate-400">Aylık patojen ve su stresi yoğunluğu (%)</p>
+              </div>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/30">RİSK %</span>
+            </div>
+            <div class="relative h-52 w-full">
+              <canvas id="riskIndexChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- HASADI ETKİLEYEN EK TARIMSAL RİSK FAKTÖRLERİ -->
+        <div class="glass-panel rounded-2xl p-4 flex flex-col gap-3">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+            <div class="flex items-center gap-2">
+              <span class="text-amber-400 text-sm">⚠️</span>
+              <h3 class="text-xs font-semibold uppercase tracking-wider text-white">Hasadı Etkileyen Kritik Agronomi & İklim Faktörleri</h3>
+            </div>
+            <span class="text-[11px] font-mono text-slate-400">YAPAY ZEKA TESPİTİ</span>
+          </div>
+
+          <div id="agronomy-alerts-list" class="grid grid-cols-1 md:grid-cols-3 gap-3"></div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Chart.js & Leaflet JS CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+  
+  <!-- 2. DEĞİŞİKLİK: Modül Giriş Noktası -->
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
