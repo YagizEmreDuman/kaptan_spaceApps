@@ -1,48 +1,63 @@
-import { SOIL_HINTS } from '../data/climateData.js';
+const SOIL_HINTS = {
+  tinli: 'Dengeli nem tutulumu',
+  killi: 'Yüksek nem -> Mantar riski artar',
+  kumlu: 'Hızlı su kaybı -> Kuraklık riski',
+  kirecli: 'Yüksek pH -> Mikro besin kilidi'
+};
 
-export function initFormManager(onAnalyzeCallback) {
-  const advisorForm = document.getElementById('advisor-form');
-  const soilRiskHint = document.getElementById('soil-risk-hint');
+export function initFormManager(onSubmitCallback) {
+  const form = document.getElementById('advisor-form');
   const quickDemoBtn = document.getElementById('quick-demo-btn');
+  const soilHintEl = document.getElementById('soil-risk-hint');
 
+  // Toprak tipi seçildikçe üstteki ipucunu güncelle
   document.querySelectorAll('input[name="soilType"]').forEach((radio) => {
     radio.addEventListener('change', (e) => {
-      const hint = SOIL_HINTS[e.target.value];
-      if (hint) {
-        soilRiskHint.textContent = hint.text;
-        soilRiskHint.className = `text-[10px] font-medium ${hint.color}`;
+      if (soilHintEl && SOIL_HINTS[e.target.value]) {
+        soilHintEl.textContent = SOIL_HINTS[e.target.value];
       }
     });
   });
 
-  function getPayload() {
-    const formData = new FormData(advisorForm);
+  function collectFormPayload() {
+    const region = document.getElementById('region')?.value || 'konya';
+    const latitude = parseFloat(document.getElementById('lat-input')?.value) || 37.8746;
+    const longitude = parseFloat(document.getElementById('lng-input')?.value) || 32.4932;
+
+    const soilType = document.querySelector('input[name="soilType"]:checked')?.value || 'tinli';
+    const soilPh = document.getElementById('soil-ph')?.value || 'notr';
+    const areaDekar = Math.max(1, Number(document.getElementById('field-area')?.value) || 120);
+
+    const targetCrop = document.getElementById('target-crop')?.value || 'bugday';
+    const irrigation = document.getElementById('irrigation')?.value || 'damla_sulama';
+    const budgetLevel = document.querySelector('input[name="budgetLevel"]:checked')?.value || 'orta';
+
+    const machinery = Array.from(document.querySelectorAll('input[name="machinery"]:checked')).map(
+      (chk) => chk.value
+    );
+
     return {
-      location: {
-        region: formData.get('region'),
-        latitude: parseFloat(formData.get('latitude')),
-        longitude: parseFloat(formData.get('longitude'))
-      },
-      soil: {
-        type: formData.get('soilType'),
-        ph: formData.get('soilPh'),
-        areaDekar: Number(formData.get('fieldArea'))
-      },
-      cropAndResources: {
-        targetCrop: formData.get('targetCrop'),
-        irrigation: formData.get('irrigation'),
-        budgetLevel: formData.get('budgetLevel'),
-        machinery: formData.getAll('machinery')
-      }
+      location: { region, latitude, longitude },
+      soil: { type: soilType, ph: soilPh, areaDekar },
+      cropAndResources: { targetCrop, irrigation, budgetLevel, machinery },
+      simOverrides: { rainDeltaPct: 0, humidityIncrease: 0 }
     };
   }
 
-  advisorForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    onAnalyzeCallback(getPayload());
-  });
+  if (form) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (typeof onSubmitCallback === 'function') {
+        onSubmitCallback(collectFormPayload());
+      }
+    });
+  }
 
-  quickDemoBtn.addEventListener('click', () => {
-    onAnalyzeCallback(getPayload());
-  });
+  if (quickDemoBtn) {
+    quickDemoBtn.addEventListener('click', () => {
+      if (typeof onSubmitCallback === 'function') {
+        onSubmitCallback(collectFormPayload());
+      }
+    });
+  }
 }

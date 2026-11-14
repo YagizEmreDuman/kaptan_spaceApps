@@ -1,48 +1,77 @@
-import { initMapManager } from './modules/mapManager.js';
+import { initMapManager, refreshMapSize } from './modules/mapManager.js';
 import { initFormManager } from './modules/formManager.js';
 import { fetchAllBackendData } from './modules/apiClient.js';
 import { renderClimateCharts } from './modules/chartManager.js';
 import { renderDashboardUI } from './modules/uiRenderer.js';
 import { renderSimulationPanel } from './modules/simulationPanel.js';
+import { initI18n, applyTranslations, t } from './modules/i18nManager.js';
 
 let lastUsedPayload = null;
 let lastApiResult = null;
 
-function setLoadingState(isLoading) {
-  const analyzeBtn = document.getElementById('analyze-btn');
-  const emptyState = document.getElementById('empty-state');
-  const loadingState = document.getElementById('api-loading-state');
-  const climatePanel = document.getElementById('climate-panel');
+function showScreen(screenName) {
+  const setupScreen = document.getElementById('setup-screen');
+  const loadingScreen = document.getElementById('api-loading-state');
+  const analysisScreen = document.getElementById('climate-panel');
+  const backBtn = document.getElementById('back-to-setup-btn');
 
-  if (analyzeBtn) {
-    analyzeBtn.disabled = isLoading;
-    analyzeBtn.classList.toggle('opacity-60', isLoading);
-    analyzeBtn.innerHTML = isLoading
-      ? `<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-         </svg>
-         <span>3 API Ucu Sorgulanıyor...</span>`
-      : `<span>İklim & Rotasyon Simülasyonunu Çalıştır</span>
-         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-         </svg>`;
-  }
+  setupScreen?.classList.add('hidden');
+  loadingScreen?.classList.add('hidden');
+  loadingScreen?.classList.remove('flex');
+  analysisScreen?.classList.add('hidden');
+  analysisScreen?.classList.remove('flex');
 
-  if (isLoading) {
-    if (emptyState) emptyState.classList.add('hidden');
-    if (climatePanel) {
-      climatePanel.classList.add('hidden');
-      climatePanel.classList.remove('flex');
-    }
-    if (loadingState) {
-      loadingState.classList.remove('hidden');
-      loadingState.classList.add('flex');
-    }
-  } else if (loadingState) {
-    loadingState.classList.add('hidden');
-    loadingState.classList.remove('flex');
+  if (screenName === 'setup') {
+    setupScreen?.classList.remove('hidden');
+    backBtn?.classList.add('hidden');
+    backBtn?.classList.remove('inline-flex');
+    refreshMapSize();
+  } else if (screenName === 'loading') {
+    loadingScreen?.classList.remove('hidden');
+    loadingScreen?.classList.add('flex');
+    backBtn?.classList.remove('hidden');
+    backBtn?.classList.add('inline-flex');
+  } else if (screenName === 'analysis') {
+    analysisScreen?.classList.remove('hidden');
+    analysisScreen?.classList.add('flex');
+    backBtn?.classList.remove('hidden');
+    backBtn?.classList.add('inline-flex');
   }
+}
+
+function initTabs() {
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const tabPanes = document.querySelectorAll('.tab-pane');
+
+  tabBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const targetId = btn.dataset.tab;
+
+      tabBtns.forEach((b) => {
+        b.className = 'tab-btn flex-1 min-w-[160px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:bg-sky-50 transition cursor-pointer';
+      });
+      btn.className = 'tab-btn flex-1 min-w-[160px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition cursor-pointer bg-emerald-500 text-white shadow-xs';
+
+      tabPanes.forEach((pane) => {
+        if (pane.id === targetId) {
+          pane.classList.remove('hidden');
+          pane.classList.add('flex');
+        } else {
+          pane.classList.add('hidden');
+          pane.classList.remove('flex');
+        }
+      });
+
+      // Grafik sekmesine geçildiğinde Chart.js boyutunu tazele
+      if (targetId === 'tab-simulation' && lastApiResult?.data) {
+        renderClimateCharts(
+          lastApiResult.data.profile,
+          lastApiResult.data.monthlyDrought,
+          lastApiResult.data.monthlyFungal
+        );
+      }
+    });
+  });
 }
 
 function renderApiStatusBanner(result, onRetry) {
@@ -52,51 +81,43 @@ function renderApiStatusBanner(result, onRetry) {
   banner.classList.remove('hidden');
 
   if (result.status === 'live') {
-    banner.className =
-      'rounded-xl px-3.5 py-2.5 border border-emerald-500/40 bg-emerald-950/30 text-emerald-200 flex flex-wrap items-center justify-between gap-2 text-xs';
-    banner.innerHTML = `
-      <div class="flex items-center gap-2">
-        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span><strong>Backend Entegrasyonu Aktif (3/3 Uç Bağlı):</strong> analyze-location, weather-tasks ve simulate-rotation canlı çalışıyor.</span>
-      </div>
-      <span class="text-[10px] font-mono text-emerald-400">localhost:3000 OK</span>
-    `;
+    banner.className = 'rounded-xl px-3.5 py-2 border border-emerald-300 bg-emerald-50 text-emerald-900 flex items-center justify-between text-xs';
+    banner.innerHTML = `<span>🟢 <strong>Canlı Backend Bağlantısı Aktif (3/3 API)</strong></span><span class="font-mono text-[10px]">localhost:3000</span>`;
   } else {
-    banner.className =
-      'rounded-xl px-3.5 py-2.5 border border-amber-500/40 bg-amber-950/30 text-amber-200 flex flex-wrap items-center justify-between gap-2 text-xs';
+    banner.className = 'rounded-xl px-3.5 py-2 border border-amber-300 bg-amber-50 text-amber-900 flex flex-wrap items-center justify-between gap-2 text-xs';
     banner.innerHTML = `
-      <div class="flex items-center gap-2">
-        <span>⚠️</span>
-        <span>
-          <strong>${result.status === 'partial' ? `Kısmi API Bağlantısı (${result.successCount}/3 Uç)` : 'Yedek Simülasyon Modu'}:</strong>
-          <span class="text-amber-300/85">${result.errors[0] || 'localhost:3000 kapalı'} — Eksik uçlar yerel motorla tamamlandı.</span>
-        </span>
-      </div>
-      <button
-        type="button"
-        id="api-retry-btn"
-        class="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/50 text-amber-200 font-mono text-[11px] font-semibold transition cursor-pointer"
-      >
-        ↻ Uçları Tekrar Dene
-      </button>
+      <span>⚠️ <strong>Yerel Simülasyon Modu:</strong> ${result.errors[0] || 'Sunucu kapalı'}</span>
+      <button type="button" id="api-retry-btn" class="px-2.5 py-1 rounded-lg bg-amber-200 hover:bg-amber-300 text-amber-950 font-mono text-[11px] font-semibold cursor-pointer">↻ Tekrar Dene</button>
     `;
-
-    const retryBtn = document.getElementById('api-retry-btn');
-    if (retryBtn) {
-      retryBtn.addEventListener('click', () => {
-        if (lastUsedPayload) onRetry(lastUsedPayload);
-      });
-    }
+    document.getElementById('api-retry-btn')?.addEventListener('click', () => {
+      if (lastUsedPayload) onRetry(lastUsedPayload);
+    });
   }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  initMapManager();
+  initI18n(() => {
+    if (lastApiResult?.data) {
+      renderClimateCharts(
+        lastApiResult.data.profile,
+        lastApiResult.data.monthlyDrought,
+        lastApiResult.data.monthlyFungal
+      );
+      applyTranslations();
+    }
+  });
 
-  async function executeAnalysis(activePayload, { onlySimulation = false, showFullLoader = true } = {}) {
+  initMapManager();
+  initTabs();
+
+  document.getElementById('back-to-setup-btn')?.addEventListener('click', () => {
+    showScreen('setup');
+  });
+
+  async function executeAnalysis(activePayload, { onlySimulation = false, switchScreen = true } = {}) {
     lastUsedPayload = activePayload;
 
-    if (showFullLoader) setLoadingState(true);
+    if (switchScreen) showScreen('loading');
 
     const result = await fetchAllBackendData(activePayload, {
       onlySimulation,
@@ -104,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     lastApiResult = result;
 
-    if (showFullLoader) setLoadingState(false);
+    if (switchScreen) showScreen('analysis');
 
     renderDashboardUI(result.data);
     renderClimateCharts(
@@ -114,17 +135,17 @@ document.addEventListener('DOMContentLoaded', () => {
     );
 
     renderApiStatusBanner(result, (retryPayload) =>
-      executeAnalysis(retryPayload, { onlySimulation: false, showFullLoader: true })
+      executeAnalysis(retryPayload, { onlySimulation: false, switchScreen: true })
     );
+
+    applyTranslations();
   }
 
   initFormManager((initialPayload) => {
     renderSimulationPanel(initialPayload, (simulatedPayload) => {
-      // Slider değişiminde sadece /api/simulate-rotation ucuna istek at
-      executeAnalysis(simulatedPayload, { onlySimulation: true, showFullLoader: false });
+      executeAnalysis(simulatedPayload, { onlySimulation: true, switchScreen: false });
     });
 
-    // İlk form gönderiminde 3 uca birden istek at
-    executeAnalysis(initialPayload, { onlySimulation: false, showFullLoader: true });
+    executeAnalysis(initialPayload, { onlySimulation: false, switchScreen: true });
   });
 });

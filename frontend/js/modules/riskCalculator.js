@@ -1,25 +1,86 @@
 import { REGIONAL_CLIMATE_DB, SOIL_LABELS } from '../data/climateData.js';
 import { CROP_ROTATION_TEMPLATES } from '../data/rotationData.js';
 
+// Güney Yarımküre (lat < 0) için 12 aylık veriyi 6 ay kaydırır (Ocak <-> Temmuz)
+function shiftSixMonths(arr) {
+  return [...arr.slice(6), ...arr.slice(0, 6)];
+}
+
+// Dünya haritasında serbest tıklanan herhangi bir koordinat için enlem bazlı iklim profili üretir
+function buildGlobalCoordinateProfile(lat, lng) {
+  const absLat = Math.abs(lat);
+  const isSouthern = lat < 0;
+  const hemiLabel = isSouthern ? 'G' : 'K';
+  const lonLabel = lng < 0 ? 'B' : 'D';
+
+  let rainBase, tempBase, fungalBase, droughtBase, frostRisk, heatWaveDays;
+
+  if (absLat < 23.5) {
+    // Tropikal Kuşak (Ekvator çevresi: sıcak ve nemli)
+    rainBase = [190, 180, 175, 140, 95, 65, 55, 60, 85, 130, 165, 185];
+    tempBase = [26.5, 26.8, 27.0, 26.8, 26.0, 25.2, 25.0, 25.5, 26.2, 26.6, 26.6, 26.5];
+    fungalBase = [80, 82, 78, 68, 52, 40, 36, 38, 48, 64, 74, 78];
+    droughtBase = [18, 18, 22, 32, 48, 62, 68, 65, 50, 34, 22, 18];
+    frostRisk = 5;
+    heatWaveDays = '38 gün (>35°C)';
+  } else if (absLat < 38) {
+    // Subtropikal / Akdeniz & Kurak Kuşak
+    rainBase = [58, 50, 44, 34, 22, 8, 3, 4, 12, 32, 48, 60];
+    tempBase = [9.5, 11.0, 14.2, 18.2, 22.8, 27.2, 30.1, 29.8, 26.0, 20.5, 14.6, 10.6];
+    fungalBase = [30, 36, 52, 68, 60, 30, 14, 14, 24, 42, 36, 32];
+    droughtBase = [18, 22, 30, 46, 66, 84, 93, 92, 76, 50, 30, 20];
+    frostRisk = 22;
+    heatWaveDays = '36 gün (>35°C)';
+  } else if (absLat < 52) {
+    // Orta Enlem / Ilıman Tarım Kuşağı
+    rainBase = [54, 48, 52, 56, 64, 60, 48, 44, 50, 56, 58, 56];
+    tempBase = [1.5, 3.2, 7.6, 12.8, 17.8, 22.0, 24.8, 24.4, 19.8, 13.8, 7.5, 2.8];
+    fungalBase = [24, 30, 45, 68, 76, 66, 46, 40, 48, 46, 34, 26];
+    droughtBase = [14, 16, 22, 32, 46, 62, 74, 76, 58, 36, 20, 15];
+    frostRisk = 54;
+    heatWaveDays = '18 gün (>35°C)';
+  } else {
+    // Yüksek Enlem / Soğuk Kuşak
+    rainBase = [42, 36, 38, 42, 52, 66, 74, 72, 60, 54, 48, 45];
+    tempBase = [-6.0, -4.5, 0.5, 6.8, 12.6, 16.8, 19.0, 18.1, 13.2, 7.2, 1.2, -3.8];
+    fungalBase = [15, 18, 28, 46, 64, 74, 76, 72, 56, 38, 22, 16];
+    droughtBase = [10, 12, 16, 24, 34, 44, 50, 48, 34, 20, 14, 10];
+    frostRisk = 76;
+    heatWaveDays = '5 gün (>35°C)';
+  }
+
+  // Güney Yarımküre'deyse mevsimleri 6 ay tersine çevir
+  const finalRain2026 = isSouthern ? shiftSixMonths(rainBase) : rainBase;
+  const finalRainHist = finalRain2026.map(r => Math.round(r * 1.1));
+  const finalTemp2026 = isSouthern ? shiftSixMonths(tempBase) : tempBase;
+  const finalFungal = isSouthern ? shiftSixMonths(fungalBase) : fungalBase;
+  const finalDrought = isSouthern ? shiftSixMonths(droughtBase) : droughtBase;
+
+  return {
+    name: `Global Parsel (${absLat.toFixed(2)}°${hemiLabel}, ${Math.abs(lng).toFixed(2)}°${lonLabel})`,
+    rain2026: finalRain2026,
+    rainHist: finalRainHist,
+    temp2026: finalTemp2026,
+    baseFungal: finalFungal,
+    baseDrought: finalDrought,
+    frostRisk,
+    gddShift: '+15 gün erken',
+    heatWaveDays
+  };
+}
+
 export function runAgronomySimulation(payload) {
   let baseProfile = REGIONAL_CLIMATE_DB[payload.location.region];
   if (!baseProfile) {
-    const latFactor = Math.max(0, (42 - payload.location.latitude) * 1.4);
-    baseProfile = {
-      name: `Özel Parsel (${payload.location.latitude.toFixed(2)}°K)`,
-      rain2026: [62, 54, 48, 42, 34, 18, 6, 5, 14, 34, 52, 65],
-      rainHist: [70, 60, 54, 46, 40, 24, 10, 8, 18, 40, 58, 72],
-      temp2026: [4, 5.8, 9.5, 14.5, 19.8, 24.8, 28.2, 28.0, 23.1, 16.8, 10.4, 5.5].map(t => +(t + latFactor * 0.4).toFixed(1)),
-      baseFungal: [25, 32, 46, 68, 74, 45, 18, 16, 26, 40, 32, 26],
-      baseDrought: [16, 20, 28, 42, 58, 76, 88, 90, 75, 50, 30, 18],
-      frostRisk: Math.round(Math.min(75, Math.max(15, (payload.location.latitude - 35) * 9))),
-      gddShift: '+15 gün erken',
-      heatWaveDays: '24 gün (>35°C)'
-    };
+    baseProfile = buildGlobalCoordinateProfile(
+      payload.location.latitude,
+      payload.location.longitude
+    );
   }
 
-  // Simülasyon Panelinden Gelen Yağış Anomalisi (%)
   const rainDeltaPct = payload.simOverrides?.rainDeltaPct ?? 0;
+  const humidityInc = payload.simOverrides?.humidityIncrease ?? 0;
+
   const adjustedRain2026 = baseProfile.rain2026.map(r =>
     Math.max(0, Math.round(r * (1 + rainDeltaPct / 100)))
   );
@@ -29,8 +90,8 @@ export function runAgronomySimulation(payload) {
     rain2026: adjustedRain2026
   };
 
-  let fungalBonus = Math.round(rainDeltaPct * 0.25);
-  let droughtBonus = Math.round(-rainDeltaPct * 0.45);
+  let fungalBonus = Math.round(rainDeltaPct * 0.25 + humidityInc * 0.45);
+  let droughtBonus = Math.round(-rainDeltaPct * 0.45 - humidityInc * 0.2);
 
   if (payload.soil.type === 'killi') fungalBonus += 14;
   if (payload.soil.type === 'kumlu') droughtBonus += 15;

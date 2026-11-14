@@ -1,28 +1,180 @@
 :root {
-  --bg-dark: #020617;
-  --panel-bg: rgba(15, 23, 42, 0.78);
-  --border-subtle: rgba(51, 65, 85, 0.65);
+  --bg-sky: #f0f9ff;
+  --bg-meadow: #f0fdf4;
+  --bg-sun: #fefce8;
+  --surface-white: #ffffff;
+  --ink-primary: #0f172a;
+  --ink-secondary: #334155;
+  --ink-muted: #64748b;
+  --green-main: #16a34a;
+  --green-soft: #dcfce7;
+  --sky-main: #0284c7;
+  --sky-soft: #e0f2fe;
+  --sun-main: #eab308;
+  --sun-soft: #fef9c3;
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  background-color: var(--bg-dark);
-  background-image: 
-    radial-gradient(circle at 15% 15%, rgba(16, 185, 129, 0.08) 0%, transparent 40%),
-    radial-gradient(circle at 85% 80%, rgba(14, 165, 233, 0.06) 0%, transparent 40%),
-    linear-gradient(rgba(30, 41, 59, 0.22) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(30, 41, 59, 0.22) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: linear-gradient(135deg, #e0f2fe 0%, #f0fdf4 48%, #fefce8 100%) !important;
+  color: var(--ink-primary) !important;
+  min-height: 100vh;
 }
 
 .font-mono {
   font-family: 'JetBrains Mono', monospace;
 }
 
+/* Saf Beyaz & Yumuşak Gölgeli Cam Kartlar */
 .glass-panel {
-  background: var(--panel-bg);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid var(--border-subtle);
-  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.55);
+  background: rgba(255, 255, 255, 0.94) !important;
+  backdrop-filter: blur(12px);
+  border: 1px solid #bae6fd !important;
+  box-shadow: 0 10px 28px -8px rgba(14, 116, 144, 0.08), 0 4px 10px -4px rgba(22, 163, 74, 0.06) !important;
+}
+
+/* JS Modüllerinden Gelen Koyu Sınıfları Otomatik Aydınlık Tarım Temasına Çevir */
+.bg-slate-950,
+.bg-slate-950\/70,
+.bg-slate-950\/75,
+.bg-slate-950\/80,
+.bg-slate-950\/40,
+.bg-slate-950\/50,
+.bg-slate-950\/30 {
+  background-color: #f8fafc !important;
+}
+
+.bg-slate-900,
+.bg-slate-900\/95,
+.bg-slate-900\/90,
+.bg-slate-900\/85,
+.bg-slate-900\/80,
+.bg-slate-900\/75,
+.bg-slate-900\/70,
+.bg-slate-900\/60,
+.bg-slate-900\/55 {
+  background-color: #ffffff !important;
+}
+
+.bg-slate-800,
+.bg-slate-800\/70 {
+  background-color: #e0f2fe !important;
+}
+
+/* Metin Kontrast Dönüşümleri */
+.glass-panel .text-white,
+[class*="bg-slate-9"] .text-white,
+header .text-white {
+  color: #0f172a !important;
+}
+
+.bg-rose-500.text-white,
+.bg-emerald-600.text-white,
+.bg-sky-600.text-white {
+  color: #ffffff !important;
+}
+
+.text-slate-100,
+.text-slate-200 {
+  color: #1e293b !important;
+}
+
+.text-slate-300 {
+  color: #334155 !important;
+}
+
+.text-slate-400,
+.text-slate-500 {
+  color: #64748b !important;
+}
+
+/* Pastel Vurgu Renklerinin Beyaz Zeminde Okunabilirliği */
+.text-emerald-400,
+.text-emerald-300 {
+  color: #15803d !important;
+}
+
+.text-sky-400,
+.text-sky-300 {
+  color: #0369a1 !important;
+}
+
+.text-amber-400,
+.text-amber-300,
+.text-amber-300\/90,
+.text-amber-200 {
+  color: #b45309 !important;
+}
+
+.text-purple-300,
+.text-purple-200 {
+  color: #6d28d9 !important;
+}
+
+.text-rose-400,
+.text-rose-300 {
+  color: #be123c !important;
+}
+
+/* Çerçeve (Border) Dönüşümleri */
+.border-slate-800,
+.border-slate-800\/90,
+.border-slate-800\/80,
+.border-slate-800\/60,
+.border-slate-800\/40,
+.border-slate-700,
+.border-slate-700\/90,
+.border-slate-700\/80 {
+  border-color: #cbd5e1 !important;
+}
+
+/* Güneş Sarısı ve Gökyüzü Mavisi Yumuşak Kutu Arka Planları */
+.bg-amber-500\/15,
+.bg-amber-500\/10,
+.bg-amber-950\/30 {
+  background-color: #fef9c3 !important;
+  border-color: #fde047 !important;
+}
+
+.bg-sky-500\/15,
+.bg-sky-500\/10 {
+  background-color: #e0f2fe !important;
+  border-color: #7dd3fc !important;
+}
+
+.bg-emerald-500\/20,
+.bg-emerald-500\/15,
+.bg-emerald-500\/10,
+.bg-emerald-950\/60,
+.bg-emerald-950\/30 {
+  background-color: #dcfce7 !important;
+  border-color: #86efac !important;
+}
+
+.bg-rose-950\/10,
+.bg-rose-950\/30,
+.bg-rose-950\/60,
+.bg-rose-500\/15 {
+  background-color: #ffe4e6 !important;
+  border-color: #fda4af !important;
+}
+
+/* Özel Açık Tema Kaydırma Çubuğu */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f0f9ff;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #86efac;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #22c55e;
 }

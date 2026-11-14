@@ -1,69 +1,58 @@
+/* Canlı Nabız Noktası */
+.pulse-dot {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 9px;
+  height: 9px;
+  border-radius: 9999px;
+  background-color: #22c55e;
+  box-shadow: 0 0 0 3px #ffffff;
+  animation: pulseRing 2s infinite;
+}
+
+@keyframes pulseRing {
+  0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.6); }
+  70% { box-shadow: 0 0 0 7px rgba(34, 197, 94, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+/* Form Seçim Kutuları */
 .chip-box {
-  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.18s ease;
+  background-color: #ffffff;
 }
 
 .chip-box:hover {
-  border-color: rgba(16, 185, 129, 0.45);
-  background-color: rgba(30, 41, 59, 0.85);
+  border-color: #38bdf8 !important;
+  background-color: #f0f9ff !important;
 }
 
+/* Seçili Rotasyon Stratejisi Vurguları */
 .rotation-card {
-  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .rotation-card:hover {
   transform: translateY(-2px);
+  box-shadow: 0 12px 24px -10px rgba(2, 132, 199, 0.16);
 }
 
-.rotation-card.selected-baseline {
-  border-color: rgba(244, 63, 94, 0.75);
-  background-color: rgba(136, 19, 55, 0.16);
-  box-shadow: 0 10px 25px -8px rgba(244, 63, 94, 0.25);
+.selected-baseline {
+  border: 2px solid #f43f5e !important;
+  background: linear-gradient(180deg, #fff1f2 0%, #ffffff 100%) !important;
 }
 
-.rotation-card.selected-alt1 {
-  border-color: rgba(16, 185, 129, 0.85);
-  background-color: rgba(6, 78, 59, 0.22);
-  box-shadow: 0 10px 25px -8px rgba(16, 185, 129, 0.28);
+.selected-alt1 {
+  border: 2px solid #22c55e !important;
+  background: linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%) !important;
+  box-shadow: 0 10px 25px -8px rgba(34, 197, 94, 0.22) !important;
 }
 
-.rotation-card.selected-alt2 {
-  border-color: rgba(56, 189, 248, 0.85);
-  background-color: rgba(12, 74, 110, 0.22);
-  box-shadow: 0 10px 25px -8px rgba(56, 189, 248, 0.28);
-}
-
-.pulse-dot {
-  position: absolute;
-  top: -2px;
-  right: -2px;
-  width: 8px;
-  height: 8px;
-  border-radius: 9999px;
-  background-color: #10b981;
-}
-
-.pulse-dot::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 9999px;
-  background-color: #10b981;
-  animation: pulse-ring 1.8s infinite;
-}
-
-@keyframes pulse-ring {
-  0% { transform: scale(1); opacity: 0.8; }
-  100% { transform: scale(2.4); opacity: 0; }
-}
-
-@keyframes fadeSlideUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.animate-fade-in {
-  animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.selected-alt2 {
+  border: 2px solid #0ea5e9 !important;
+  background: linear-gradient(180deg, #f0f9ff 0%, #ffffff 100%) !important;
+  box-shadow: 0 10px 25px -8px rgba(14, 165, 233, 0.22) !important;
 }
 
 /* Dikey Fenolojik Timeline Bağlantı Çizgisi */
@@ -79,7 +68,7 @@
   top: 1.25rem;
   bottom: -0.75rem;
   width: 2px;
-  background: rgba(51, 65, 85, 0.7);
+  background: #bae6fd;
 }
 
 .timeline-item:last-child::before {
@@ -93,4 +82,6 @@
   width: 0.8rem;
   height: 0.8rem;
   border-radius: 9999px;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 2px #bae6fd;
 }
