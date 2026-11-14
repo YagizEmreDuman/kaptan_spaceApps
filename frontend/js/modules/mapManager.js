@@ -1,13 +1,11 @@
 let globalMapInstance = null;
 
-// Harita görünür hale geldiğinde boyutunu yeniden hesaplamak için dışarı açıyoruz
 export function refreshMapSize() {
   if (globalMapInstance) {
     setTimeout(() => globalMapInstance.invalidateSize(), 100);
   }
 }
 
-// Boylam değerini her zaman -180 ile +180 arasına sabitler (NASA API koruması)
 function normalizeLongitude(lng) {
   return ((((lng + 180) % 360) + 360) % 360) - 180;
 }
@@ -28,7 +26,6 @@ export function initMapManager() {
   const initialLat = parseFloat(latInput?.value) || 37.8746;
   const initialLng = parseFloat(lngInput?.value) || 32.4932;
 
-  // Dünya Haritası Ayarları (Tüm kıtalar görünür, sınır dışı taşma engelli)
   const map = L.map('field-map', {
     zoomControl: true,
     attributionControl: true,
@@ -42,18 +39,9 @@ export function initMapManager() {
 
   globalMapInstance = map;
 
-  const voyagerTiles = L.tileLayer(
-    'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-    {
-      attribution: '&copy; OpenStreetMap &copy; CARTO',
-      subdomains: 'abcd',
-      noWrap: true,
-      maxZoom: 18
-    }
-  );
-
-  const osmFallbackTiles = L.tileLayer(
-    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  // API Anahtarı Gerektirmeyen Ücretsiz Katmanlar
+  const osmStreetTiles = L.tileLayer(
+    'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {
       attribution: '&copy; OpenStreetMap',
       noWrap: true,
@@ -61,16 +49,26 @@ export function initMapManager() {
     }
   );
 
-  let fallbackActivated = false;
-  voyagerTiles.on('tileerror', () => {
-    if (!fallbackActivated) {
-      fallbackActivated = true;
-      map.removeLayer(voyagerTiles);
-      osmFallbackTiles.addTo(map);
+  const esriSatelliteTiles = L.tileLayer(
+    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    {
+      attribution: '&copy; Esri',
+      noWrap: true,
+      maxZoom: 18
     }
-  });
+  );
 
-  voyagerTiles.addTo(map);
+  osmStreetTiles.addTo(map);
+
+  // Sağ üst köşeye Harita / Uydu geçiş anahtarı ekle
+  L.control.layers(
+    {
+      '🗺️ Harita': osmStreetTiles,
+      '🛰️ Uydu': esriSatelliteTiles
+    },
+    null,
+    { position: 'topright' }
+  ).addTo(map);
 
   const pinIcon = L.divIcon({
     className: '',
@@ -115,7 +113,6 @@ export function initMapManager() {
     }
   }
 
-  // Haritaya tıklama & pin sürükleme
   map.on('click', (e) => {
     syncCoordinates(e.latlng.lat, e.latlng.lng, { setCustomDropdown: true, fly: false });
   });
@@ -125,7 +122,6 @@ export function initMapManager() {
     syncCoordinates(pos.lat, pos.lng, { setCustomDropdown: true, fly: false });
   });
 
-  // Hazır Küresel Bölge Seçici
   if (regionSelect) {
     regionSelect.addEventListener('change', () => {
       const selected = regionSelect.options[regionSelect.selectedIndex];
@@ -137,7 +133,6 @@ export function initMapManager() {
     });
   }
 
-  // Şehir / Ülke Arama (OpenStreetMap Nominatim)
   async function handleCitySearch() {
     const query = searchInput?.value?.trim();
     if (!query) return;
@@ -178,7 +173,6 @@ export function initMapManager() {
     });
   }
 
-  // "Konumumu Bul" GPS
   if (locateBtn) {
     locateBtn.addEventListener('click', () => {
       if (!navigator.geolocation) return;
