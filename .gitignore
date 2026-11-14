@@ -1,0 +1,13 @@
+# Node.js (Senin için)
+node_modules/
+.env
+
+# Python (Furkan için)
+__pycache__/
+*.pyc
+venv/
+env/
+
+# OS / Sistem
+.DS_Store
+Thumbs.db
