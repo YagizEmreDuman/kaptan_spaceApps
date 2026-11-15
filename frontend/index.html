@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title> CropGuard AI</title>
+  <title>CropGuard AI | KAPTAN - NASA Space Apps</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -37,10 +37,10 @@
       </div>
 
       <div class="flex items-center gap-2 sm:gap-3 text-xs font-mono shrink-0">
-        <!-- Analiz ekranındayken görünen geri dönüş butonu -->
         <button
           type="button"
           id="back-to-setup-btn"
+          data-i18n="back_to_setup"
           class="hidden items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-100 hover:bg-sky-200 border border-sky-300 text-sky-900 font-sans font-semibold text-xs transition cursor-pointer"
         >
           ← Tarlayı Düzenle
@@ -50,7 +50,6 @@
           📍 37.87°K, 32.49°D
         </span>
 
-        <!-- 6 DİLLİ SEÇİCİ MENÜ -->
         <select
           id="language-switcher"
           aria-label="Language"
@@ -69,13 +68,11 @@
 
   <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
-    <!-- ===================================================================== -->
-    <!-- AŞAMA 1: TAM EKRAN TARLA KURULUMU & DÜNYA HARİTASI                     -->
-    <!-- ===================================================================== -->
+    <!-- AŞAMA 1: TAM EKRAN TARLA KURULUMU & DÜNYA HARİTASI -->
     <section id="setup-screen" class="glass-panel rounded-3xl p-5 sm:p-8 flex flex-col gap-6">
       <div class="flex flex-wrap items-center justify-between gap-3 border-b border-sky-100 pb-4">
         <div>
-          <span class="text-[11px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800">ADIM 1 / 2 • TARLA KURULUMU</span>
+          <span data-i18n="step_badge" class="text-[11px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800">ADIM 1 / 2 • TARLA KURULUMU</span>
           <h2 data-i18n="left_title" class="text-xl sm:text-2xl font-bold text-slate-900 mt-1.5">Konum & Tarla Profili</h2>
           <p data-i18n="left_subtitle" class="text-xs sm:text-sm text-slate-600">Dünya haritasından tarlanızı seçin, toprak ve mevcut ürün bilgilerinizi girin.</p>
         </div>
@@ -97,18 +94,19 @@
             </span>
           </div>
 
-          <!-- Şehir / Ülke Arama + Hazır Küresel Havzalar -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <div class="flex gap-1.5">
               <input
                 type="text"
                 id="map-search-input"
+                data-i18n-placeholder="search_placeholder"
                 placeholder="Şehir veya ülke ara (Örn: Konya, Iowa, Madrid)..."
                 class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-emerald-500"
               />
               <button
                 type="button"
                 id="map-search-btn"
+                data-i18n="btn_search"
                 class="px-3 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold transition cursor-pointer shrink-0"
               >
                 Ara
@@ -116,14 +114,23 @@
             </div>
 
             <select id="region" name="region" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 focus:outline-none focus:border-emerald-500">
+<<<<<<< HEAD
               <option value="konya" data-lat="37.8746" data-lng="32.4932">🇹🇷 Türkiye — Konya Ovası</option>
               <option value="cukurova" data-lat="36.9914" data-lng="35.3308">🇹🇷 Türkiye — Çukurova (Adana)</option>
               <option value="ankara" data-lat="39.9334" data-lng="32.8597">🇹🇷 Türkiye — Ankara</option>
+=======
+              <option value="konya" data-lat="37.8746" data-lng="32.4932" data-i18n="region_konya">🇹🇷 Türkiye — Konya Ovası</option>
+              <option value="cukurova" data-lat="36.9914" data-lng="35.3308" data-i18n="region_cukurova">🇹🇷 Türkiye — Çukurova (Adana)</option>
+              <option value="midwest" data-lat="41.8780" data-lng="-93.0977" data-i18n="region_midwest">🇺🇸 ABD — Midwest Mısır Kuşağı</option>
+              <option value="castilla" data-lat="39.2796" data-lng="-3.0977" data-i18n="region_castilla">🇪🇸 İspanya — Castilla-La Mancha</option>
+              <option value="matogrosso" data-lat="-12.6819" data-lng="-56.9211" data-i18n="region_matogrosso">🇧🇷 Brezilya — Mato Grosso (G. Yarımküre)</option>
+              <option value="bavaria" data-lat="48.7904" data-lng="11.4979" data-i18n="region_bavaria">🇩🇪 Almanya — Bavyera Havzası</option>
+              <option value="flevoland" data-lat="52.5279" data-lng="5.5953" data-i18n="region_flevoland">🇳🇱 Hollanda — Flevoland Polderleri</option>
+>>>>>>> 885cb75fda71c41ed560548b2ef94d86ee4d869d
               <option value="custom" data-lat="39.0000" data-lng="35.0000" data-i18n="region_custom">📍 Özel Koordinat (Haritadan Seçildi)</option>
             </select>
           </div>
 
-          <!-- Canlı Online Harita Kutusu -->
           <div class="relative rounded-2xl overflow-hidden border-2 border-sky-200 shadow-sm">
             <div id="field-map" class="w-full z-10"></div>
             <div class="bg-sky-50 px-3 py-2 border-t border-sky-200 flex items-center justify-between text-xs text-slate-600">
@@ -138,10 +145,9 @@
           <input type="hidden" id="lng-input" name="longitude" value="32.4932" />
         </div>
 
-        <!-- SAĞ 5 KOLON: SADELEŞTİRİLMİŞ TARLA FORMU -->
+        <!-- SAĞ 5 KOLON: TARLA FORMU -->
         <div class="lg:col-span-5 flex flex-col gap-4 bg-white/80 rounded-2xl p-4 sm:p-5 border border-sky-100">
 
-          <!-- Toprak Yapısı -->
           <div class="flex flex-col gap-2">
             <div class="flex items-center justify-between">
               <label data-i18n="sec2_title" class="text-xs font-bold uppercase tracking-wider text-emerald-700">2. Toprak Yapısı</label>
@@ -198,7 +204,6 @@
             </div>
           </div>
 
-          <!-- Ürün, Sulama, Bütçe & Makine -->
           <div class="flex flex-col gap-2.5 border-t border-sky-100 pt-3">
             <label data-i18n="sec3_title" class="text-xs font-bold uppercase tracking-wider text-emerald-700">3. Mevcut Ürün & İmkânlar</label>
 
@@ -276,9 +281,7 @@
       </form>
     </section>
 
-    <!-- ===================================================================== -->
-    <!-- YÜKLENME EKRANI                                                       -->
-    <!-- ===================================================================== -->
+    <!-- YÜKLENME EKRANI -->
     <section id="api-loading-state" class="hidden glass-panel rounded-3xl p-10 flex-col justify-center items-center text-center min-h-[480px]">
       <div class="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center mb-4">
         <svg class="w-7 h-7 text-emerald-600 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -286,45 +289,55 @@
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
         </svg>
       </div>
+<<<<<<< HEAD
       <h3 class="text-lg font-bold text-slate-900">Uydu İklim Verileri & Rotasyon Analiz Ediliyor...</h3>
       <p class="text-xs text-slate-600 mt-1">Seçtiğiniz koordinat için mevcut tahminler ve rotasyon seçenekleri alınıyor.</p>
+=======
+      <h3 data-i18n="loading_title" class="text-lg font-bold text-slate-900">Uydu İklim Verileri & Rotasyon Analiz Ediliyor...</h3>
+      <p data-i18n="loading_sub" class="text-xs text-slate-600 mt-1">Seçtiğiniz koordinat için 3 strateji ve 14 günlük hava takvimi hazırlanıyor.</p>
+>>>>>>> 885cb75fda71c41ed560548b2ef94d86ee4d869d
     </section>
 
-    <!-- ===================================================================== -->
-    <!-- AŞAMA 2: SADELEŞTİRİLMİŞ 3 SEKMELİ ANALİZ EKRANI                      -->
-    <!-- ===================================================================== -->
+    <!-- AŞAMA 2: SADELEŞTİRİLMİŞ 3 SEKMELİ ANALİZ EKRANI -->
     <section id="climate-panel" class="hidden flex-col gap-5">
 
-      <!-- API Durum Bandı -->
       <div id="api-status-banner" class="hidden rounded-xl p-3 border flex-wrap items-center justify-between gap-2 text-xs"></div>
 
       <!-- TEK CÜMLELİK NET KARAR ÖZETİ KARTI -->
       <div class="glass-panel rounded-2xl p-5 border-l-4 border-l-emerald-500 flex flex-col gap-3">
         <div class="flex flex-wrap items-center justify-between gap-2">
           <div class="flex items-center gap-2">
+<<<<<<< HEAD
             <span class="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">💡 ALGORITHM KARŞILAŞTIRMASI</span>
             <span id="report-coords" class="text-xs font-mono text-slate-500">—</span>
             <span id="report-area" class="text-xs font-mono font-semibold text-amber-800 bg-amber-100 px-2 py-0.5 rounded">—</span>
+=======
+            <span data-i18n="ai_decision_badge" class="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">💡 YAPAY ZEKA ÖZET KARARI</span>
+            <span id="report-coords" class="text-xs font-mono text-slate-500">37.87°K, 32.49°D</span>
+            <span id="report-area" class="text-xs font-mono font-semibold text-amber-800 bg-amber-100 px-2 py-0.5 rounded">120 da</span>
+>>>>>>> 885cb75fda71c41ed560548b2ef94d86ee4d869d
           </div>
           <h2 id="report-title" class="text-xs font-semibold text-slate-600">Analiz bekleniyor</h2>
         </div>
 
-        <!-- İnsancıl Tek Cümlelik Öneri -->
         <p id="decision-hero-sentence" class="text-sm sm:text-base font-medium text-slate-900 leading-relaxed"></p>
-
-        <!-- 3 Basit Trafik Işığı Risk Özeti -->
         <div id="traffic-light-badges" class="flex flex-wrap items-center gap-2 pt-1"></div>
       </div>
 
       <!-- 3 ANA SEKME (TAB) MENÜSÜ -->
       <div class="flex flex-wrap gap-2 bg-white/80 p-1.5 rounded-2xl border border-sky-200 shadow-xs">
+<<<<<<< HEAD
         <button type="button" data-tab="tab-rotation" class="tab-btn flex-1 min-w-[160px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition cursor-pointer bg-emerald-500 text-white shadow-xs">
           1. Rotasyon Karşılaştırması
+=======
+        <button type="button" data-tab="tab-rotation" data-i18n="tab_1" class="tab-btn flex-1 min-w-[160px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition cursor-pointer bg-emerald-500 text-white shadow-xs">
+          1. Rotasyon & Ekim Takvimi
+>>>>>>> 885cb75fda71c41ed560548b2ef94d86ee4d869d
         </button>
-        <button type="button" data-tab="tab-tasks" class="tab-btn flex-1 min-w-[160px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:bg-sky-50 transition cursor-pointer">
+        <button type="button" data-tab="tab-tasks" data-i18n="tab_2" class="tab-btn flex-1 min-w-[160px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:bg-sky-50 transition cursor-pointer">
           2. Hava Durumu & Görevler
         </button>
-        <button type="button" data-tab="tab-simulation" class="tab-btn flex-1 min-w-[160px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:bg-sky-50 transition cursor-pointer">
+        <button type="button" data-tab="tab-simulation" data-i18n="tab_3" class="tab-btn flex-1 min-w-[160px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:bg-sky-50 transition cursor-pointer">
           3. Senaryo Testi & Grafikler
         </button>
         <button type="button" data-tab="tab-farm-simulation" class="tab-btn flex-1 min-w-[160px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:bg-sky-50 transition cursor-pointer">
@@ -337,8 +350,13 @@
         <div class="glass-panel rounded-2xl p-5 flex flex-col gap-4">
           <div class="flex flex-wrap items-center justify-between gap-2 border-b border-sky-100 pb-3">
             <div>
+<<<<<<< HEAD
               <h3 data-i18n="rot_title" class="text-base font-bold text-slate-900">Rotasyon Seçenekleri</h3>
               <p class="text-xs text-slate-500">Algorithm motorunun ürettiği seçenekleri ve ürün sıralarını karşılaştırın.</p>
+=======
+              <h3 data-i18n="rot_title" class="text-base font-bold text-slate-900">Size Özel 3 Rotasyon Seçeneği</h3>
+              <p data-i18n="rot_subtitle" class="text-xs text-slate-500">Bir strateji kartına tıklayarak aşağıdaki 12 aylık ekim takvimini güncelleyin.</p>
+>>>>>>> 885cb75fda71c41ed560548b2ef94d86ee4d869d
             </div>
           </div>
 
@@ -377,10 +395,14 @@
           </div>
         </div>
 
-        <!-- Teknik Agronomi Detayları (Kalabalık yapmaması için açılır kutu içinde) -->
         <details class="glass-panel rounded-2xl p-4 cursor-pointer">
+<<<<<<< HEAD
           <summary class="text-xs font-bold text-slate-700 select-none">
             🔬 Kaynaklar, Senaryo ve Veri Sınırlamaları
+=======
+          <summary data-i18n="tech_summary" class="text-xs font-bold text-slate-700 select-none">
+            🔬 Teknik Agronomi & İklim Detaylarını Göster (GDD, VPD, Toprak Etkileşimi)
+>>>>>>> 885cb75fda71c41ed560548b2ef94d86ee4d869d
           </summary>
           <div id="agronomy-alerts-list" class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3 pt-3 border-t border-sky-100"></div>
         </details>

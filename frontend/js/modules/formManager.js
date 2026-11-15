@@ -1,20 +1,14 @@
-const SOIL_HINTS = {
-  tinli: 'Dengeli nem tutulumu',
-  killi: 'Yüksek nem -> Mantar riski artar',
-  kumlu: 'Hızlı su kaybı -> Kuraklık riski',
-  kirecli: 'Yüksek pH -> Mikro besin kilidi'
-};
+import { t } from './i18nManager.js';
 
 export function initFormManager(onSubmitCallback) {
   const form = document.getElementById('advisor-form');
   const quickDemoBtn = document.getElementById('quick-demo-btn');
   const soilHintEl = document.getElementById('soil-risk-hint');
 
-  // Toprak tipi seçildikçe üstteki ipucunu güncelle
   document.querySelectorAll('input[name="soilType"]').forEach((radio) => {
     radio.addEventListener('change', (e) => {
-      if (soilHintEl && SOIL_HINTS[e.target.value]) {
-        soilHintEl.textContent = SOIL_HINTS[e.target.value];
+      if (soilHintEl) {
+        soilHintEl.textContent = t(`soil_hint_${e.target.value}`);
       }
     });
   });
