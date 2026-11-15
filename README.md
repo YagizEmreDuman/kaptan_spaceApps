@@ -4,6 +4,11 @@
 **Hackathon:** NASA Space Apps Challenge  
 **Görev (Challenge):** Field Shift: Adapting Farms with NASA Data  
 
+> [!IMPORTANT]
+> **⚠️ Bölgesel Kapsam & Demo Sürümü Uyarısı (Regional Demo Scope Notice):**  
+> Uygulama şu anda **prototip / demo sürümünde** olduğundan, yüksek çözünürlüklü **NASA GEOS-S2S** ve **NASA POWER (`2006–2025`)** iklim-toprak veri ızgarası (265 grid noktası, `35°N–43°N` enlem ve `25°E–45°E` boylam) **yalnızca Türkiye genelinde** aktif olarak çalışmaktadır. Harita üzerinden **Türkiye sınırları içerisindeki** tarım havzalarını ve koordinatları seçerek tam kapsamlı simülasyon yapabilirsiniz.  
+> *(As this application is currently in its demo/prototype release, the pre-processed NASA GEOS-S2S and NASA POWER 265-point agro-climatic grid operates exclusively across **Türkiye (`35°N–43°N, 25°E–45°E`)**. Please select coordinates within Türkiye for full rotation and yield analysis.)*
+
 ---
 
 ## 🎯 Problem ve Çözüm Hikayemiz (Impact & Storytelling)
@@ -42,7 +47,6 @@ Sistemimiz karar destek mekanizmasının kalbinde çok katmanlı uydu, model ve 
 * **🔄 Dinamik Ürün Rotasyonu & Ekonomik Analiz:** Mevcut monokültür plan ile en yüksek puanlı 2 alternatif rotasyonun uygunluk puanı (`0–100`), bölgesel iklim ve toprak tipine göre **önerilen erken ekim penceresi (`-X Gün Erken Ekim`)**, **su tasarrufu (`%`)**, **verim koruma/kayıp oranı (`%`)** ve **net sezonluk gelir farkı (`₺`)** karşılaştırması.
 * **🌾 3B Perspektif "Sanal Tarla" Simülasyonu:** İki farklı ürünü (`Senaryo A` ve `Senaryo B`) aynı iklim, toprak ve sulama koşullarında 5 fenolojik gelişim aşaması boyunca (`Tohum/Ekim → Çimlenme → Büyüme → Gelişmiş Bitki → Hasat`) yan yana test eden interaktif kanvas animasyonu.
 * **📅 12 Aylık Fenolojik Ekim Takvimi & 14 Günlük Saha Görevleri:** Seçilen rotasyon stratejisine, toprak dokusuna ve NASA aylık tahminlerine göre özelleştirilmiş 8 aşamalı sezon yol haritası ve işaretlenebilir 14 günlük çiftçi uyarı listesi.
-* **🌍 12 Dil Desteği (i18n):** Türkçe, İngilizce, Almanca, Fransızca, İspanyolca, İtalyanca, Rusça, Arapça, Çince, Japonca, Portekizce ve Felemenkçe arayüz desteği.
 
 ---
 
