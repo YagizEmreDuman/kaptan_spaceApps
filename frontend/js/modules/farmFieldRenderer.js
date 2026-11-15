@@ -71,26 +71,97 @@ export class FarmFieldRenderer {
     const warmth = clamp(conditions.temperatureChangeC / 15, 0, 1);
     ctx.fillStyle = `rgba(251,185,70,${.5 + warmth * .4})`; ctx.beginPath(); ctx.arc(width - 64, 54, 25 + warmth * 10, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = '#bed6a5'; ctx.beginPath(); ctx.moveTo(0, height * .5); ctx.quadraticCurveTo(width * .3, height * .25, width * .6, height * .48); ctx.quadraticCurveTo(width * .85, height * .33, width, height * .44); ctx.lineTo(width, height); ctx.lineTo(0, height); ctx.fill();
+
+    // 3D Trapezoid Field Boundaries
+    const yTop = height * .48;
+    const yBottom = height * .94;
+    const xLeftTop = width * .16;
+    const xRightTop = width * .84;
+    const xLeftBottom = width * .02;
+    const xRightBottom = width * .98;
+
+    const fieldEdgeLeft = t => xLeftTop + t * (xLeftBottom - xLeftTop);
+    const fieldEdgeRight = t => xRightTop + t * (xRightBottom - xRightTop);
+    const fieldY = t => yTop + t * (yBottom - yTop);
+
     const dry = clamp(-conditions.rainfallChangePct / 100, 0, 1);
     ctx.fillStyle = dry ? '#aa835b' : '#8c6948';
-    ctx.beginPath(); ctx.moveTo(width * .16, height * .48); ctx.lineTo(width * .84, height * .48); ctx.lineTo(width * .98, height * .94); ctx.lineTo(width * .02, height * .94); ctx.closePath(); ctx.fill();
-    ctx.strokeStyle = '#705034'; ctx.lineWidth = 2;
-    for (let row = 0; row < 5; row++) {
-      const depth = row / 4, y = height * (.54 + depth * .085), margin = width * (.18 - depth * .11);
-      ctx.beginPath(); ctx.moveTo(margin, y + 5); ctx.lineTo(width - margin, y + 5); ctx.stroke();
-      for (let col = 0; col < 9; col++) {
-        const x = margin + (width - margin * 2) * (col + .5) / 9;
-        ctx.save(); ctx.translate(x, y); ctx.scale(.55 + depth * .45, .55 + depth * .45);
+    ctx.beginPath();
+    ctx.moveTo(xLeftTop, yTop);
+    ctx.lineTo(xRightTop, yTop);
+    ctx.lineTo(xRightBottom, yBottom);
+    ctx.lineTo(xLeftBottom, yBottom);
+    ctx.closePath();
+    ctx.fill();
+
+    const cols = 9;
+    const rows = 5;
+    const padRatio = 0.045;
+
+    // Perspective longitudinal furrow lines converging toward the horizon vanishing point
+    ctx.strokeStyle = dry ? 'rgba(112, 80, 52, 0.38)' : 'rgba(92, 64, 40, 0.42)';
+    ctx.lineWidth = 1.5;
+    for (let col = 0; col < cols; col++) {
+      const u = (col + 0.5) / cols;
+      const tStart = 0.06;
+      const tEnd = 0.93;
+      const lStart = fieldEdgeLeft(tStart), rStart = fieldEdgeRight(tStart);
+      const lEnd = fieldEdgeLeft(tEnd), rEnd = fieldEdgeRight(tEnd);
+      const wStart = rStart - lStart, wEnd = rEnd - lEnd;
+      const xStart = lStart + wStart * (padRatio + (1 - 2 * padRatio) * u);
+      const xEnd = lEnd + wEnd * (padRatio + (1 - 2 * padRatio) * u);
+      ctx.beginPath();
+      ctx.moveTo(xStart, fieldY(tStart));
+      ctx.lineTo(xEnd, fieldY(tEnd));
+      ctx.stroke();
+    }
+
+    // Perspective horizontal planted rows (foreshortened spacing from back to front of trapezoid)
+    for (let row = 0; row < rows; row++) {
+      const normRow = row / (rows - 1);
+      // Perspective foreshortening: closer rows at the bottom have wider vertical spacing
+      const t = 0.12 + Math.pow(normRow, 1.15) * 0.74;
+      const y = fieldY(t);
+      const leftEdge = fieldEdgeLeft(t);
+      const rightEdge = fieldEdgeRight(t);
+      const rowSpan = rightEdge - leftEdge;
+      const rowLeft = leftEdge + rowSpan * padRatio;
+      const rowRight = rightEdge - rowSpan * padRatio;
+
+      ctx.strokeStyle = '#705034';
+      ctx.lineWidth = 1.4 + normRow * 1.1;
+      ctx.beginPath();
+      ctx.moveTo(rowLeft, y + 3);
+      ctx.lineTo(rowRight, y + 3);
+      ctx.stroke();
+
+      const scale = 0.50 + t * 0.54;
+      for (let col = 0; col < cols; col++) {
+        const u = (col + 0.5) / cols;
+        const x = rowLeft + (rowRight - rowLeft) * u;
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.scale(scale, scale);
         if (progress < .19) {
           ctx.fillStyle = crop === 'lentil' ? '#c27b49' : '#d4ab63';
-          ctx.beginPath(); ctx.ellipse(0, 0, crop === 'barley' ? 2 : 3.5, 2, -.4, 0, Math.PI * 2); ctx.fill();
+          ctx.beginPath();
+          ctx.ellipse(0, 0, crop === 'barley' ? 2.4 : 3.8, 2.2, -.35, 0, Math.PI * 2);
+          ctx.fill();
         } else {
-          const height = 10 + clamp((progress - .19) / .61, 0, 1) * 65;
-          plant(ctx, crop, height, progress, pressure === null ? 0 : clamp(pressure / 100, 0, 1), Math.sin(seconds * 2 + col + row) * .025);
+          const plantHeight = 10 + clamp((progress - .19) / .61, 0, 1) * 62;
+          plant(
+            ctx,
+            crop,
+            plantHeight,
+            progress,
+            pressure === null ? 0 : clamp(pressure / 100, 0, 1),
+            Math.sin(seconds * 2 + col + row) * .025
+          );
         }
         ctx.restore();
       }
     }
+
     // Weather effects are explicitly the USER'S scenario cues, not a forecast.
     if (conditions.rainfallChangePct > 0) {
       ctx.strokeStyle = 'rgba(43,137,181,.6)'; ctx.lineWidth = 1.5;

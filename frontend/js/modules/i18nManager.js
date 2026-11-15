@@ -1,7 +1,7 @@
 import { TRANSLATIONS } from '../data/translations.js';
 
 const STORAGE_KEY = 'cropguard_lang';
-let currentLang = localStorage.getItem(STORAGE_KEY) || 'tr';
+let currentLang = (typeof localStorage !== 'undefined' && localStorage.getItem(STORAGE_KEY)) || 'tr';
 
 export function getCurrentLang() {
   return currentLang;
