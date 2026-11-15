@@ -1,0 +1,23 @@
+{
+  "location": {
+    "latitude": 37.8746,
+    "longitude": 32.4932
+  },
+  "climateSummary": {},
+  "forecast": {
+    "month": "2026-11"
+  },
+  "farmerInputs": {
+    "currentRotation": [
+      "wheat",
+      "wheat"
+    ],
+    "availableCrops": [
+      "wheat",
+      "chickpea",
+      "lentil"
+    ],
+    "irrigationAvailable": false
+  },
+  "scenario": {}
+}

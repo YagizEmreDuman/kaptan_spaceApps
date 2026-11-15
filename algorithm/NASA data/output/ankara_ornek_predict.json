@@ -1,0 +1,173 @@
+{
+  "status": "forecast_context_plus_exploratory_rotation",
+  "location": {
+    "requestedLat": 39.9334,
+    "requestedLon": 32.8597,
+    "gridLat": 40.0,
+    "gridLon": 33.125
+  },
+  "historicalClimate": {
+    "referencePeriod": "2006-2024",
+    "monthlyMeanPrecipitationMm": 30.111,
+    "monthlyMeanTemperatureC": 5.581
+  },
+  "forecast": {
+    "validMonth": "2026-11",
+    "temperatureC": 5.106,
+    "temperatureDifferenceFromHistoricalCUnadjusted": -0.475,
+    "soilWetnessWet3Index": 0.4227,
+    "monthlyPrecipitationMm": null,
+    "temperatureInitialization": "2026-10-03",
+    "soilMoistureInitialization": "2026-10-28",
+    "temperatureEnsembleMembers": 1,
+    "wet3EnsembleMembers": 1,
+    "temperatureSource": "20261003.at.ens1.lead1.nc4",
+    "soilMoistureSource": "20261028.wet3.ens1.lead1.nc4"
+  },
+  "riskAssessment": null,
+  "rotationStrategies": [
+    {
+      "id": "current",
+      "type": "current",
+      "cropSequence": [
+        "wheat",
+        "wheat"
+      ],
+      "cropNames": [
+        "Buğday",
+        "Buğday"
+      ],
+      "benefitsToExplore": [
+        "Ayni bitki ailesinin tekrarinda hastalik ve besin dengesi riskleri yerel olarak kontrol edilmelidir."
+      ],
+      "waterEvidence": [
+        {
+          "crop": "wheat",
+          "seasonalEtGuideMm": [
+            450.0,
+            650.0
+          ],
+          "lowerBoundExceedsUserEtLimit": false
+        },
+        {
+          "crop": "wheat",
+          "seasonalEtGuideMm": [
+            450.0,
+            650.0
+          ],
+          "lowerBoundExceedsUserEtLimit": false
+        }
+      ],
+      "localChecksRequired": [
+        "Toprak pH, tekstur, drenaj ve ekim-hasat takvimi bilinmiyor.",
+        "Hastalik/zararli gecmisi, pazar ve ekipman uygunlugu yerelde dogrulanmali."
+      ],
+      "validatedYieldPrediction": null,
+      "successProbability": null,
+      "ranking": null
+    },
+    {
+      "id": "alternative_1",
+      "type": "alternative",
+      "cropSequence": [
+        "wheat",
+        "chickpea"
+      ],
+      "cropNames": [
+        "Buğday",
+        "Nohut"
+      ],
+      "benefitsToExplore": [
+        "Tahildan sonra baklagil eklemek, uygun yerel kosullarda hastalik dongusunu kesmeye ve azot dongusune katki saglamaya yardimci olabilir."
+      ],
+      "waterEvidence": [
+        {
+          "crop": "wheat",
+          "seasonalEtGuideMm": [
+            450.0,
+            650.0
+          ],
+          "lowerBoundExceedsUserEtLimit": false
+        },
+        {
+          "crop": "chickpea",
+          "seasonalEtGuideMm": null,
+          "lowerBoundExceedsUserEtLimit": false
+        }
+      ],
+      "localChecksRequired": [
+        "Toprak pH, tekstur, drenaj ve ekim-hasat takvimi bilinmiyor.",
+        "Hastalik/zararli gecmisi, pazar ve ekipman uygunlugu yerelde dogrulanmali.",
+        "Nohut icin urun-ozel su ihtiyaci araligi eksik; uygunluk hesaplanmadi."
+      ],
+      "validatedYieldPrediction": null,
+      "successProbability": null,
+      "ranking": null
+    },
+    {
+      "id": "alternative_2",
+      "type": "alternative",
+      "cropSequence": [
+        "wheat",
+        "lentil"
+      ],
+      "cropNames": [
+        "Buğday",
+        "Mercimek"
+      ],
+      "benefitsToExplore": [
+        "Tahildan sonra baklagil eklemek, uygun yerel kosullarda hastalik dongusunu kesmeye ve azot dongusune katki saglamaya yardimci olabilir."
+      ],
+      "waterEvidence": [
+        {
+          "crop": "wheat",
+          "seasonalEtGuideMm": [
+            450.0,
+            650.0
+          ],
+          "lowerBoundExceedsUserEtLimit": false
+        },
+        {
+          "crop": "lentil",
+          "seasonalEtGuideMm": null,
+          "lowerBoundExceedsUserEtLimit": false
+        }
+      ],
+      "localChecksRequired": [
+        "Toprak pH, tekstur, drenaj ve ekim-hasat takvimi bilinmiyor.",
+        "Hastalik/zararli gecmisi, pazar ve ekipman uygunlugu yerelde dogrulanmali.",
+        "Mercimek icin urun-ozel su ihtiyaci araligi eksik; uygunluk hesaplanmadi."
+      ],
+      "validatedYieldPrediction": null,
+      "successProbability": null,
+      "ranking": null
+    }
+  ],
+  "rotationAssessmentStatus": "exploratory_rule_based_not_trained_ml",
+  "cropCatalogSources": [
+    "https://www.fao.org/4/s2022e/s2022e07.htm",
+    "https://www.fao.org/4/Y5146E/y5146e0a.htm"
+  ],
+  "inputHandling": {
+    "farmerInputsUsed": true,
+    "scenarioUsed": true,
+    "externalForecastUsed": false
+  },
+  "availableMonths": [
+    "2026-11"
+  ],
+  "limitations": [
+    "Yagis tahmini dosyasi bulunmuyor; referans ortalaması tahmin degildir",
+    "Tek veya az ensemble uyesinden tahmin belirsizligi hesaplanamaz",
+    "T2M ve WET3 farkli tarihlerde baslatildi",
+    "GEOS T2M ile POWER referans farki kalibrasyonsuzdur",
+    "WET3 ile POWER GWETROOT dogrudan kiyaslanamaz",
+    "Rotasyonlar kural tabanli kesifsel senaryolardir; urun uygunlugu veya verim tahmini degildir",
+    "En yakin grid verisidir, tarla seviyesi tahmin degildir",
+    "Bunlar aciklanabilir rotasyon senaryolaridir; tarla bazinda dogrulanmis oneriler degildir.",
+    "FAO sezonluk urun ET rehberleri sulama gereksinimi veya yagisla tek basina karsilastirilabilecek esikler degildir.",
+    "Mevcut NASA GEOS-S2S dosyalarinda gelecege yonelik yagis tahmini bulunmuyor.",
+    "WET3 tahminleri gecmis POWER GWETROOT ile dogrudan karsilastirilamaz.",
+    "Senaryoda yagis %-15 degisimi kullanici varsayimidir; NASA tahmini degildir. Bu surumde rotasyon uygunluguna sayisal etki olarak uygulanmaz."
+  ]
+}

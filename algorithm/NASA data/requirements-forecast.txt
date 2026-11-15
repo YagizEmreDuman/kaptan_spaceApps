@@ -1,0 +1,9 @@
+numpy
+pandas
+netCDF4
+shapely
+fastapi
+uvicorn
+# Integration tests:
+httpx
+pytest

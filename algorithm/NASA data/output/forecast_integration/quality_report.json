@@ -1,0 +1,165 @@
+{
+  "sourceFile": "turkiye_tahmin_sicaklik_yagis_9ay.csv",
+  "inputRows": 4446,
+  "inputPoints": 494,
+  "retainedRows": 2970,
+  "retainedPoints": 330,
+  "excludedRowsOutsideTurkey": 1476,
+  "duplicateRecords": 0,
+  "missingValues": 0,
+  "pointsWithIncompleteMonths": 0,
+  "availableMonths": {
+    "t2m": [
+      "2026-11",
+      "2026-12",
+      "2027-01",
+      "2027-02",
+      "2027-03",
+      "2027-04",
+      "2027-05",
+      "2027-06",
+      "2027-07"
+    ],
+    "wet3": [
+      "2026-11"
+    ],
+    "rain": []
+  },
+  "warnings": [
+    "temp_ay_8.nc4: okunamayan NetCDF; dosya boyutu 0 bayt",
+    "Yagis tahmin dosyasi bulunamadi; tarihsel ortalamalar tahmin yerine kullanilmadi"
+  ],
+  "inventory": [
+    {
+      "file": "data\\2025_kasim_tarihsel_stres.csv",
+      "variables": []
+    },
+    {
+      "file": "data\\20261003.at.ens1.lead1.nc4",
+      "variables": [
+        "T2M"
+      ]
+    },
+    {
+      "file": "data\\20261028.wet3.ens1.lead1.nc4",
+      "variables": [
+        "WET3"
+      ]
+    },
+    {
+      "file": "data\\turkiye_2025_iklim_risk_gostergeleri.csv",
+      "variables": []
+    },
+    {
+      "file": "data\\turkiye_aylik_iklim_referansi_2006_2024.csv",
+      "variables": []
+    },
+    {
+      "file": "data\\turkiye_geos_tahmin_baglam.csv",
+      "variables": []
+    },
+    {
+      "file": "data\\urun_katalogu.csv",
+      "variables": []
+    },
+    {
+      "file": "output\\2025_aylik_izgara_ozeti.csv",
+      "variables": []
+    },
+    {
+      "file": "output\\geos_aylik_tahmin_uzun_format.csv",
+      "variables": []
+    },
+    {
+      "file": "output\\turkiye_2025_iklim_anomalileri.csv",
+      "variables": []
+    },
+    {
+      "file": "output\\turkiye_2025_iklim_risk_gostergeleri.csv",
+      "variables": []
+    },
+    {
+      "file": "output\\turkiye_2025_yagis_anomalileri.csv",
+      "variables": []
+    },
+    {
+      "file": "output\\turkiye_aylik_iklim_referansi_2006_2024.csv",
+      "variables": []
+    },
+    {
+      "file": "output\\turkiye_aylik_yagis_referansi_2006_2024.csv",
+      "variables": []
+    },
+    {
+      "file": "output\\turkiye_birlesik_iklim_2006_2025.csv",
+      "variables": []
+    },
+    {
+      "file": "output\\turkiye_geos_tahmin_baglam.csv",
+      "variables": []
+    },
+    {
+      "file": "output\\turkiye_iklim_analizi_2006_2025.csv",
+      "variables": []
+    },
+    {
+      "file": "output\\turkiye_iklim_risk_gostergeleri_2006_2025.csv",
+      "variables": []
+    },
+    {
+      "file": "output\\turkiye_kasim_2026_tahmin_ve_gecmis_baglam.csv",
+      "variables": []
+    },
+    {
+      "file": "output\\turkiye_kuraklik_ozellikleri_2015_2025_output.csv",
+      "variables": []
+    },
+    {
+      "file": "output\\turkiye_nasa_power_daily_2015_2025.csv",
+      "variables": []
+    },
+    {
+      "file": "output\\turkiye_nasa_power_monthly_2015_2025.csv",
+      "variables": []
+    },
+    {
+      "file": "turkiye_2006_2025_yagis_grid.csv",
+      "variables": []
+    },
+    {
+      "file": "turkiye_2006_2025_yagis_monthly.csv",
+      "variables": []
+    },
+    {
+      "file": "turkiye_20_yillik_iklim_ve_toprak_nemi.csv",
+      "variables": []
+    },
+    {
+      "file": "turkiye_birlesik_iklim_2006_2025.csv",
+      "variables": []
+    },
+    {
+      "file": "turkiye_geos_s2s_9aylik_tahmin.csv",
+      "variables": [
+        "T2M"
+      ]
+    },
+    {
+      "file": "turkiye_kuraklik_ozellikleri_2015_2025.csv",
+      "variables": []
+    },
+    {
+      "file": "turkiye_kuraklik_ozellikleri_2015_2025_output.csv",
+      "variables": []
+    },
+    {
+      "file": "turkiye_tahmin_sicaklik_yagis_9ay.csv",
+      "variables": [
+        "T2M"
+      ]
+    }
+  ],
+  "referencePeriod": "2006-2025",
+  "spatialMapping": "nearest Turkey-covered GEOS point to POWER grid; max 0.75 degree scaled distance",
+  "temperaturePriority": "nine-month CSV; other temperature exports are not blended"
+}

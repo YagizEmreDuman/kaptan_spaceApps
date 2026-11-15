@@ -1,0 +1,812 @@
+{
+  "status": "exploratory_scenario_and_rotation",
+  "location": {
+    "requestedLat": 37.8746,
+    "requestedLon": 32.4932,
+    "gridLat": 38.0,
+    "gridLon": 32.5
+  },
+  "historicalClimate": {
+    "referencePeriod": "2006-2025",
+    "monthlyMeanPrecipitationMm": 33.93,
+    "monthlyMeanTemperatureC": 6.629
+  },
+  "forecast": {
+    "validMonth": "2026-11",
+    "temperatureC": 5.234,
+    "soilWetnessWet3Index": 0.4474,
+    "monthlyPrecipitationMm": null,
+    "temperatureInitialization": "2026-10-23",
+    "soilMoistureInitialization": "2026-10-28",
+    "precipitationInitialization": null,
+    "ensembleMembersT2M": 1,
+    "ensembleMembersWET3": 1
+  },
+  "monthlyForecasts": [
+    {
+      "month": "2026-11",
+      "temperatureC": 5.234,
+      "precipitationMm": null,
+      "soilWetnessWet3Index": 0.4474,
+      "historicalBaseline": {
+        "referencePeriod": "2006-2025",
+        "source": "NASA POWER",
+        "temperatureC": 6.629,
+        "precipitationMm": 33.93,
+        "temperatureYearCount": 20.0,
+        "precipitationYearCount": 20.0,
+        "gridLat": 38.0,
+        "gridLon": 32.5
+      },
+      "temperatureDifferenceCUnadjusted": -1.395,
+      "precipitationDifferencePctUnadjusted": null,
+      "comparisonStatus": "uncalibrated_cross_product_comparison",
+      "forecastSource": "NASA GEOS-S2S",
+      "forecastRunDate": "2026-10-23",
+      "variableForecasts": {
+        "temperature": {
+          "available": true,
+          "forecastRunDate": "2026-10-23",
+          "sourceFile": "turkiye_tahmin_sicaklik_yagis_9ay.csv",
+          "sourceVariable": "T2M",
+          "sourceUnits": "K",
+          "outputUnits": "degC",
+          "gridLat": 38.0,
+          "gridLon": 32.5,
+          "ensembleMembers": 1,
+          "ensembleMember": 1.0,
+          "ensembleEvidence": "veri_deneme3.py selects .at.ens1.lead; CSV has no member column",
+          "ensembleStatus": "single_member_no_confidence_interval"
+        },
+        "precipitation": {
+          "available": false,
+          "forecastRunDate": null,
+          "sourceFile": null,
+          "sourceVariable": null,
+          "sourceUnits": null,
+          "outputUnits": "mm/month",
+          "gridLat": null,
+          "gridLon": null,
+          "ensembleMembers": null,
+          "ensembleMember": null,
+          "ensembleEvidence": null,
+          "ensembleStatus": "missing"
+        },
+        "soilMoisture": {
+          "available": true,
+          "forecastRunDate": "2026-10-28",
+          "sourceFile": "20261028.wet3.ens1.lead1.nc4",
+          "sourceVariable": "WET3",
+          "sourceUnits": "1",
+          "outputUnits": "1",
+          "gridLat": 38.0,
+          "gridLon": 32.5,
+          "ensembleMembers": 1,
+          "ensembleMember": 1.0,
+          "ensembleEvidence": "20261028.wet3.ens1.lead1.nc4",
+          "ensembleStatus": "single_member_no_confidence_interval"
+        }
+      }
+    },
+    {
+      "month": "2026-12",
+      "temperatureC": 1.782,
+      "precipitationMm": null,
+      "soilWetnessWet3Index": null,
+      "historicalBaseline": {
+        "referencePeriod": "2006-2025",
+        "source": "NASA POWER",
+        "temperatureC": 1.954,
+        "precipitationMm": 52.158,
+        "temperatureYearCount": 20.0,
+        "precipitationYearCount": 20.0,
+        "gridLat": 38.0,
+        "gridLon": 32.5
+      },
+      "temperatureDifferenceCUnadjusted": -0.172,
+      "precipitationDifferencePctUnadjusted": null,
+      "comparisonStatus": "uncalibrated_cross_product_comparison",
+      "forecastSource": "NASA GEOS-S2S",
+      "forecastRunDate": "2026-10-23",
+      "variableForecasts": {
+        "temperature": {
+          "available": true,
+          "forecastRunDate": "2026-10-23",
+          "sourceFile": "turkiye_tahmin_sicaklik_yagis_9ay.csv",
+          "sourceVariable": "T2M",
+          "sourceUnits": "K",
+          "outputUnits": "degC",
+          "gridLat": 38.0,
+          "gridLon": 32.5,
+          "ensembleMembers": 1,
+          "ensembleMember": 1.0,
+          "ensembleEvidence": "veri_deneme3.py selects .at.ens1.lead; CSV has no member column",
+          "ensembleStatus": "single_member_no_confidence_interval"
+        },
+        "precipitation": {
+          "available": false,
+          "forecastRunDate": null,
+          "sourceFile": null,
+          "sourceVariable": null,
+          "sourceUnits": null,
+          "outputUnits": "mm/month",
+          "gridLat": null,
+          "gridLon": null,
+          "ensembleMembers": null,
+          "ensembleMember": null,
+          "ensembleEvidence": null,
+          "ensembleStatus": "missing"
+        },
+        "soilMoisture": {
+          "available": false,
+          "forecastRunDate": null,
+          "sourceFile": null,
+          "sourceVariable": null,
+          "sourceUnits": null,
+          "outputUnits": "1",
+          "gridLat": null,
+          "gridLon": null,
+          "ensembleMembers": null,
+          "ensembleMember": null,
+          "ensembleEvidence": null,
+          "ensembleStatus": "missing"
+        }
+      }
+    },
+    {
+      "month": "2027-01",
+      "temperatureC": 2.41,
+      "precipitationMm": null,
+      "soilWetnessWet3Index": null,
+      "historicalBaseline": {
+        "referencePeriod": "2006-2025",
+        "source": "NASA POWER",
+        "temperatureC": -0.245,
+        "precipitationMm": 53.289,
+        "temperatureYearCount": 20.0,
+        "precipitationYearCount": 20.0,
+        "gridLat": 38.0,
+        "gridLon": 32.5
+      },
+      "temperatureDifferenceCUnadjusted": 2.655,
+      "precipitationDifferencePctUnadjusted": null,
+      "comparisonStatus": "uncalibrated_cross_product_comparison",
+      "forecastSource": "NASA GEOS-S2S",
+      "forecastRunDate": "2026-10-23",
+      "variableForecasts": {
+        "temperature": {
+          "available": true,
+          "forecastRunDate": "2026-10-23",
+          "sourceFile": "turkiye_tahmin_sicaklik_yagis_9ay.csv",
+          "sourceVariable": "T2M",
+          "sourceUnits": "K",
+          "outputUnits": "degC",
+          "gridLat": 38.0,
+          "gridLon": 32.5,
+          "ensembleMembers": 1,
+          "ensembleMember": 1.0,
+          "ensembleEvidence": "veri_deneme3.py selects .at.ens1.lead; CSV has no member column",
+          "ensembleStatus": "single_member_no_confidence_interval"
+        },
+        "precipitation": {
+          "available": false,
+          "forecastRunDate": null,
+          "sourceFile": null,
+          "sourceVariable": null,
+          "sourceUnits": null,
+          "outputUnits": "mm/month",
+          "gridLat": null,
+          "gridLon": null,
+          "ensembleMembers": null,
+          "ensembleMember": null,
+          "ensembleEvidence": null,
+          "ensembleStatus": "missing"
+        },
+        "soilMoisture": {
+          "available": false,
+          "forecastRunDate": null,
+          "sourceFile": null,
+          "sourceVariable": null,
+          "sourceUnits": null,
+          "outputUnits": "1",
+          "gridLat": null,
+          "gridLon": null,
+          "ensembleMembers": null,
+          "ensembleMember": null,
+          "ensembleEvidence": null,
+          "ensembleStatus": "missing"
+        }
+      }
+    },
+    {
+      "month": "2027-02",
+      "temperatureC": 4.256,
+      "precipitationMm": null,
+      "soilWetnessWet3Index": null,
+      "historicalBaseline": {
+        "referencePeriod": "2006-2025",
+        "source": "NASA POWER",
+        "temperatureC": 1.482,
+        "precipitationMm": 34.612,
+        "temperatureYearCount": 20.0,
+        "precipitationYearCount": 20.0,
+        "gridLat": 38.0,
+        "gridLon": 32.5
+      },
+      "temperatureDifferenceCUnadjusted": 2.775,
+      "precipitationDifferencePctUnadjusted": null,
+      "comparisonStatus": "uncalibrated_cross_product_comparison",
+      "forecastSource": "NASA GEOS-S2S",
+      "forecastRunDate": "2026-10-23",
+      "variableForecasts": {
+        "temperature": {
+          "available": true,
+          "forecastRunDate": "2026-10-23",
+          "sourceFile": "turkiye_tahmin_sicaklik_yagis_9ay.csv",
+          "sourceVariable": "T2M",
+          "sourceUnits": "K",
+          "outputUnits": "degC",
+          "gridLat": 38.0,
+          "gridLon": 32.5,
+          "ensembleMembers": 1,
+          "ensembleMember": 1.0,
+          "ensembleEvidence": "veri_deneme3.py selects .at.ens1.lead; CSV has no member column",
+          "ensembleStatus": "single_member_no_confidence_interval"
+        },
+        "precipitation": {
+          "available": false,
+          "forecastRunDate": null,
+          "sourceFile": null,
+          "sourceVariable": null,
+          "sourceUnits": null,
+          "outputUnits": "mm/month",
+          "gridLat": null,
+          "gridLon": null,
+          "ensembleMembers": null,
+          "ensembleMember": null,
+          "ensembleEvidence": null,
+          "ensembleStatus": "missing"
+        },
+        "soilMoisture": {
+          "available": false,
+          "forecastRunDate": null,
+          "sourceFile": null,
+          "sourceVariable": null,
+          "sourceUnits": null,
+          "outputUnits": "1",
+          "gridLat": null,
+          "gridLon": null,
+          "ensembleMembers": null,
+          "ensembleMember": null,
+          "ensembleEvidence": null,
+          "ensembleStatus": "missing"
+        }
+      }
+    },
+    {
+      "month": "2027-03",
+      "temperatureC": 3.784,
+      "precipitationMm": null,
+      "soilWetnessWet3Index": null,
+      "historicalBaseline": {
+        "referencePeriod": "2006-2025",
+        "source": "NASA POWER",
+        "temperatureC": 4.915,
+        "precipitationMm": 38.006,
+        "temperatureYearCount": 20.0,
+        "precipitationYearCount": 20.0,
+        "gridLat": 38.0,
+        "gridLon": 32.5
+      },
+      "temperatureDifferenceCUnadjusted": -1.131,
+      "precipitationDifferencePctUnadjusted": null,
+      "comparisonStatus": "uncalibrated_cross_product_comparison",
+      "forecastSource": "NASA GEOS-S2S",
+      "forecastRunDate": "2026-10-23",
+      "variableForecasts": {
+        "temperature": {
+          "available": true,
+          "forecastRunDate": "2026-10-23",
+          "sourceFile": "turkiye_tahmin_sicaklik_yagis_9ay.csv",
+          "sourceVariable": "T2M",
+          "sourceUnits": "K",
+          "outputUnits": "degC",
+          "gridLat": 38.0,
+          "gridLon": 32.5,
+          "ensembleMembers": 1,
+          "ensembleMember": 1.0,
+          "ensembleEvidence": "veri_deneme3.py selects .at.ens1.lead; CSV has no member column",
+          "ensembleStatus": "single_member_no_confidence_interval"
+        },
+        "precipitation": {
+          "available": false,
+          "forecastRunDate": null,
+          "sourceFile": null,
+          "sourceVariable": null,
+          "sourceUnits": null,
+          "outputUnits": "mm/month",
+          "gridLat": null,
+          "gridLon": null,
+          "ensembleMembers": null,
+          "ensembleMember": null,
+          "ensembleEvidence": null,
+          "ensembleStatus": "missing"
+        },
+        "soilMoisture": {
+          "available": false,
+          "forecastRunDate": null,
+          "sourceFile": null,
+          "sourceVariable": null,
+          "sourceUnits": null,
+          "outputUnits": "1",
+          "gridLat": null,
+          "gridLon": null,
+          "ensembleMembers": null,
+          "ensembleMember": null,
+          "ensembleEvidence": null,
+          "ensembleStatus": "missing"
+        }
+      }
+    },
+    {
+      "month": "2027-04",
+      "temperatureC": 12.71,
+      "precipitationMm": null,
+      "soilWetnessWet3Index": null,
+      "historicalBaseline": {
+        "referencePeriod": "2006-2025",
+        "source": "NASA POWER",
+        "temperatureC": 10.027,
+        "precipitationMm": 29.13,
+        "temperatureYearCount": 20.0,
+        "precipitationYearCount": 20.0,
+        "gridLat": 38.0,
+        "gridLon": 32.5
+      },
+      "temperatureDifferenceCUnadjusted": 2.683,
+      "precipitationDifferencePctUnadjusted": null,
+      "comparisonStatus": "uncalibrated_cross_product_comparison",
+      "forecastSource": "NASA GEOS-S2S",
+      "forecastRunDate": "2026-10-23",
+      "variableForecasts": {
+        "temperature": {
+          "available": true,
+          "forecastRunDate": "2026-10-23",
+          "sourceFile": "turkiye_tahmin_sicaklik_yagis_9ay.csv",
+          "sourceVariable": "T2M",
+          "sourceUnits": "K",
+          "outputUnits": "degC",
+          "gridLat": 38.0,
+          "gridLon": 32.5,
+          "ensembleMembers": 1,
+          "ensembleMember": 1.0,
+          "ensembleEvidence": "veri_deneme3.py selects .at.ens1.lead; CSV has no member column",
+          "ensembleStatus": "single_member_no_confidence_interval"
+        },
+        "precipitation": {
+          "available": false,
+          "forecastRunDate": null,
+          "sourceFile": null,
+          "sourceVariable": null,
+          "sourceUnits": null,
+          "outputUnits": "mm/month",
+          "gridLat": null,
+          "gridLon": null,
+          "ensembleMembers": null,
+          "ensembleMember": null,
+          "ensembleEvidence": null,
+          "ensembleStatus": "missing"
+        },
+        "soilMoisture": {
+          "available": false,
+          "forecastRunDate": null,
+          "sourceFile": null,
+          "sourceVariable": null,
+          "sourceUnits": null,
+          "outputUnits": "1",
+          "gridLat": null,
+          "gridLon": null,
+          "ensembleMembers": null,
+          "ensembleMember": null,
+          "ensembleEvidence": null,
+          "ensembleStatus": "missing"
+        }
+      }
+    },
+    {
+      "month": "2027-05",
+      "temperatureC": 18.892,
+      "precipitationMm": null,
+      "soilWetnessWet3Index": null,
+      "historicalBaseline": {
+        "referencePeriod": "2006-2025",
+        "source": "NASA POWER",
+        "temperatureC": 15.091,
+        "precipitationMm": 40.238,
+        "temperatureYearCount": 20.0,
+        "precipitationYearCount": 20.0,
+        "gridLat": 38.0,
+        "gridLon": 32.5
+      },
+      "temperatureDifferenceCUnadjusted": 3.802,
+      "precipitationDifferencePctUnadjusted": null,
+      "comparisonStatus": "uncalibrated_cross_product_comparison",
+      "forecastSource": "NASA GEOS-S2S",
+      "forecastRunDate": "2026-10-23",
+      "variableForecasts": {
+        "temperature": {
+          "available": true,
+          "forecastRunDate": "2026-10-23",
+          "sourceFile": "turkiye_tahmin_sicaklik_yagis_9ay.csv",
+          "sourceVariable": "T2M",
+          "sourceUnits": "K",
+          "outputUnits": "degC",
+          "gridLat": 38.0,
+          "gridLon": 32.5,
+          "ensembleMembers": 1,
+          "ensembleMember": 1.0,
+          "ensembleEvidence": "veri_deneme3.py selects .at.ens1.lead; CSV has no member column",
+          "ensembleStatus": "single_member_no_confidence_interval"
+        },
+        "precipitation": {
+          "available": false,
+          "forecastRunDate": null,
+          "sourceFile": null,
+          "sourceVariable": null,
+          "sourceUnits": null,
+          "outputUnits": "mm/month",
+          "gridLat": null,
+          "gridLon": null,
+          "ensembleMembers": null,
+          "ensembleMember": null,
+          "ensembleEvidence": null,
+          "ensembleStatus": "missing"
+        },
+        "soilMoisture": {
+          "available": false,
+          "forecastRunDate": null,
+          "sourceFile": null,
+          "sourceVariable": null,
+          "sourceUnits": null,
+          "outputUnits": "1",
+          "gridLat": null,
+          "gridLon": null,
+          "ensembleMembers": null,
+          "ensembleMember": null,
+          "ensembleEvidence": null,
+          "ensembleStatus": "missing"
+        }
+      }
+    },
+    {
+      "month": "2027-06",
+      "temperatureC": 21.272,
+      "precipitationMm": null,
+      "soilWetnessWet3Index": null,
+      "historicalBaseline": {
+        "referencePeriod": "2006-2025",
+        "source": "NASA POWER",
+        "temperatureC": 19.824,
+        "precipitationMm": 29.73,
+        "temperatureYearCount": 20.0,
+        "precipitationYearCount": 20.0,
+        "gridLat": 38.0,
+        "gridLon": 32.5
+      },
+      "temperatureDifferenceCUnadjusted": 1.448,
+      "precipitationDifferencePctUnadjusted": null,
+      "comparisonStatus": "uncalibrated_cross_product_comparison",
+      "forecastSource": "NASA GEOS-S2S",
+      "forecastRunDate": "2026-10-23",
+      "variableForecasts": {
+        "temperature": {
+          "available": true,
+          "forecastRunDate": "2026-10-23",
+          "sourceFile": "turkiye_tahmin_sicaklik_yagis_9ay.csv",
+          "sourceVariable": "T2M",
+          "sourceUnits": "K",
+          "outputUnits": "degC",
+          "gridLat": 38.0,
+          "gridLon": 32.5,
+          "ensembleMembers": 1,
+          "ensembleMember": 1.0,
+          "ensembleEvidence": "veri_deneme3.py selects .at.ens1.lead; CSV has no member column",
+          "ensembleStatus": "single_member_no_confidence_interval"
+        },
+        "precipitation": {
+          "available": false,
+          "forecastRunDate": null,
+          "sourceFile": null,
+          "sourceVariable": null,
+          "sourceUnits": null,
+          "outputUnits": "mm/month",
+          "gridLat": null,
+          "gridLon": null,
+          "ensembleMembers": null,
+          "ensembleMember": null,
+          "ensembleEvidence": null,
+          "ensembleStatus": "missing"
+        },
+        "soilMoisture": {
+          "available": false,
+          "forecastRunDate": null,
+          "sourceFile": null,
+          "sourceVariable": null,
+          "sourceUnits": null,
+          "outputUnits": "1",
+          "gridLat": null,
+          "gridLon": null,
+          "ensembleMembers": null,
+          "ensembleMember": null,
+          "ensembleEvidence": null,
+          "ensembleStatus": "missing"
+        }
+      }
+    },
+    {
+      "month": "2027-07",
+      "temperatureC": 23.038,
+      "precipitationMm": null,
+      "soilWetnessWet3Index": null,
+      "historicalBaseline": {
+        "referencePeriod": "2006-2025",
+        "source": "NASA POWER",
+        "temperatureC": 23.268,
+        "precipitationMm": 7.874,
+        "temperatureYearCount": 20.0,
+        "precipitationYearCount": 20.0,
+        "gridLat": 38.0,
+        "gridLon": 32.5
+      },
+      "temperatureDifferenceCUnadjusted": -0.231,
+      "precipitationDifferencePctUnadjusted": null,
+      "comparisonStatus": "uncalibrated_cross_product_comparison",
+      "forecastSource": "NASA GEOS-S2S",
+      "forecastRunDate": "2026-10-23",
+      "variableForecasts": {
+        "temperature": {
+          "available": true,
+          "forecastRunDate": "2026-10-23",
+          "sourceFile": "turkiye_tahmin_sicaklik_yagis_9ay.csv",
+          "sourceVariable": "T2M",
+          "sourceUnits": "K",
+          "outputUnits": "degC",
+          "gridLat": 38.0,
+          "gridLon": 32.5,
+          "ensembleMembers": 1,
+          "ensembleMember": 1.0,
+          "ensembleEvidence": "veri_deneme3.py selects .at.ens1.lead; CSV has no member column",
+          "ensembleStatus": "single_member_no_confidence_interval"
+        },
+        "precipitation": {
+          "available": false,
+          "forecastRunDate": null,
+          "sourceFile": null,
+          "sourceVariable": null,
+          "sourceUnits": null,
+          "outputUnits": "mm/month",
+          "gridLat": null,
+          "gridLon": null,
+          "ensembleMembers": null,
+          "ensembleMember": null,
+          "ensembleEvidence": null,
+          "ensembleStatus": "missing"
+        },
+        "soilMoisture": {
+          "available": false,
+          "forecastRunDate": null,
+          "sourceFile": null,
+          "sourceVariable": null,
+          "sourceUnits": null,
+          "outputUnits": "1",
+          "gridLat": null,
+          "gridLon": null,
+          "ensembleMembers": null,
+          "ensembleMember": null,
+          "ensembleEvidence": null,
+          "ensembleStatus": "missing"
+        }
+      }
+    }
+  ],
+  "forecastCoverage": {
+    "sourceFile": "turkiye_tahmin_sicaklik_yagis_9ay.csv",
+    "inputRows": 4446,
+    "inputPoints": 494,
+    "retainedRows": 2970,
+    "retainedPoints": 330,
+    "excludedRowsOutsideTurkey": 1476,
+    "duplicateRecords": 0,
+    "missingValues": 0,
+    "pointsWithIncompleteMonths": 0,
+    "availableMonths": {
+      "t2m": [
+        "2026-11",
+        "2026-12",
+        "2027-01",
+        "2027-02",
+        "2027-03",
+        "2027-04",
+        "2027-05",
+        "2027-06",
+        "2027-07"
+      ],
+      "wet3": [
+        "2026-11"
+      ],
+      "rain": []
+    },
+    "warnings": [
+      "temp_ay_8.nc4: okunamayan NetCDF; dosya boyutu 0 bayt",
+      "Yagis tahmin dosyasi bulunamadi; tarihsel ortalamalar tahmin yerine kullanilmadi"
+    ],
+    "referencePeriod": "2006-2025",
+    "spatialMapping": "nearest Turkey-covered GEOS point to POWER grid; max 0.75 degree scaled distance",
+    "temperaturePriority": "nine-month CSV; other temperature exports are not blended"
+  },
+  "climateSummary": {
+    "historicalBaseline": {
+      "referencePeriod": "2006-2025",
+      "source": "NASA POWER",
+      "temperatureC": 6.629,
+      "precipitationMm": 33.93,
+      "temperatureYearCount": 20.0,
+      "precipitationYearCount": 20.0,
+      "gridLat": 38.0,
+      "gridLon": 32.5
+    },
+    "temperatureDifferenceCUnadjusted": -1.395,
+    "precipitationDifferencePctUnadjusted": null,
+    "comparisonStatus": "uncalibrated_cross_product_comparison",
+    "usedInRotationScoring": false
+  },
+  "farmerInputs": {
+    "currentRotation": [
+      "wheat",
+      "wheat"
+    ],
+    "availableCrops": [
+      "wheat",
+      "chickpea",
+      "lentil"
+    ],
+    "irrigationAvailable": false
+  },
+  "scenario": {},
+  "historicalStressContext": {
+    "period": "2025-11",
+    "historicalExploratoryStressIndex": 43.1,
+    "isCurrentOrForecast": false
+  },
+  "scenarioAnalysis": {
+    "mode": "user_hypothetical_not_nasa_forecast",
+    "rainfallChangePct": 0.0,
+    "temperatureChangeC": 0.0,
+    "irrigationAvailabilityChangePct": 0.0,
+    "indicativeScenarioPressureIndex0to100": 50.0,
+    "formula": "clip(50 - 0.35*rainfallChangePct + 3*temperatureChangeC - 0.12*irrigationAvailabilityChangePct, 0,100)",
+    "projectedMonthlyPrecipitationMm": null,
+    "precipitationBaseSource": null,
+    "projectedMonthlyTemperatureC": 5.234
+  },
+  "rotationStrategies": [
+    {
+      "id": "current",
+      "type": "current",
+      "cropSequence": [
+        "wheat",
+        "wheat"
+      ],
+      "cropNames": [
+        "Buğday",
+        "Buğday"
+      ],
+      "rotationBenefitToExplore": "Ayni ailenin tekrari; hastalik/zararli dongusu incelenmeli",
+      "indicativeSuitabilityIndex0to100": 35,
+      "indicativeBand": "orta",
+      "waterEvidence": {
+        "secondCropSeasonalEtGuideMm": [
+          450.0,
+          650.0
+        ],
+        "etLimitExceeded": null,
+        "isIrrigationDemandEstimate": false
+      },
+      "risksAndLocalChecks": [
+        "Ayni bitki ailesinde tekrar: hastalik ve besin dengesi kontrolu",
+        "Sulama bulunmadigi bildirildi; su dengesi yerel olarak incelenmeli",
+        "Ekim takvimi, pH, toprak teksturu, drenaj, zararli gecmisi ve pazar bilgisi dogrulanmali",
+        "Aylik yagis miktari ile mevsimsel ET dogrudan karsilastirilmadi"
+      ],
+      "evidenceLimitations": [
+        "Puanlar secilmis sezgisel agirliklarla uretilmistir; verim/tarimsal uygunluk modeline karsi kalibre edilmedi"
+      ],
+      "yieldPrediction": null,
+      "successProbability": null
+    },
+    {
+      "id": "alternative_1",
+      "type": "alternative",
+      "cropSequence": [
+        "wheat",
+        "chickpea"
+      ],
+      "cropNames": [
+        "Buğday",
+        "Nohut"
+      ],
+      "rotationBenefitToExplore": "Baklagil rotasyonu, uygun kosullarda azot dongusune katki saglayabilir",
+      "indicativeSuitabilityIndex0to100": 54,
+      "indicativeBand": "orta",
+      "waterEvidence": {
+        "secondCropSeasonalEtGuideMm": null,
+        "etLimitExceeded": null,
+        "isIrrigationDemandEstimate": false
+      },
+      "risksAndLocalChecks": [
+        "Urun-ozel guvenilir sezonluk ET araligi yok; su uygunlugu bilinmiyor",
+        "Sulama bulunmadigi bildirildi; su dengesi yerel olarak incelenmeli",
+        "Ekim takvimi, pH, toprak teksturu, drenaj, zararli gecmisi ve pazar bilgisi dogrulanmali",
+        "Aylik yagis miktari ile mevsimsel ET dogrudan karsilastirilmadi"
+      ],
+      "evidenceLimitations": [
+        "Puanlar secilmis sezgisel agirliklarla uretilmistir; verim/tarimsal uygunluk modeline karsi kalibre edilmedi"
+      ],
+      "yieldPrediction": null,
+      "successProbability": null
+    },
+    {
+      "id": "alternative_2",
+      "type": "alternative",
+      "cropSequence": [
+        "wheat",
+        "lentil"
+      ],
+      "cropNames": [
+        "Buğday",
+        "Mercimek"
+      ],
+      "rotationBenefitToExplore": "Baklagil rotasyonu, uygun kosullarda azot dongusune katki saglayabilir",
+      "indicativeSuitabilityIndex0to100": 54,
+      "indicativeBand": "orta",
+      "waterEvidence": {
+        "secondCropSeasonalEtGuideMm": null,
+        "etLimitExceeded": null,
+        "isIrrigationDemandEstimate": false
+      },
+      "risksAndLocalChecks": [
+        "Urun-ozel guvenilir sezonluk ET araligi yok; su uygunlugu bilinmiyor",
+        "Sulama bulunmadigi bildirildi; su dengesi yerel olarak incelenmeli",
+        "Ekim takvimi, pH, toprak teksturu, drenaj, zararli gecmisi ve pazar bilgisi dogrulanmali",
+        "Aylik yagis miktari ile mevsimsel ET dogrudan karsilastirilmadi"
+      ],
+      "evidenceLimitations": [
+        "Puanlar secilmis sezgisel agirliklarla uretilmistir; verim/tarimsal uygunluk modeline karsi kalibre edilmedi"
+      ],
+      "yieldPrediction": null,
+      "successProbability": null
+    }
+  ],
+  "modelType": "explainable_heuristic_no_trained_ml",
+  "inputHandling": {
+    "climateSummary": "reserved_not_used_in_scoring",
+    "forecast": "month selects supplied GEOS context; forecast values are explanatory and not used in rotation scoring",
+    "farmerInputs": "currentRotation, availableCrops, irrigationAvailable, maxSeasonalCropWaterNeedMm",
+    "scenario": "rainfallChangePct, temperatureChangeC, irrigationAvailabilityChangePct"
+  },
+  "limitations": [
+    "Sayisal indeksler kalibre edilmis kuraklik olasiligi veya urun basarisi degildir",
+    "Tahminler tek ensemble uyesidir; ensemble ortalamasi veya guven araligi hesaplanmadi. CSV uye bilgisi disaktarma koduna dayanir",
+    "GEOS T2M ve WET3 ayri baslangic tarihlerinden geliyor",
+    "GEOS WET3 ile POWER GWETROOT dogrudan karsilastirilmaz",
+    "Eksik yagis/toprak nemi tahminleri null; tarihsel ortalamalar tahmin yerine kullanilmaz",
+    "Aylik referans ortalamalari POWER 2006-2025 verilerinden hesaplandi; tarihsel 2025 stres indeksi eski 2006-2024 referansini korur",
+    "GEOS-S2S ve POWER farklari yanlilik duzeltmesi yapilmamis kaynaklar arasi karsilastirmadir; kalibre anomali veya kesin risk degildir",
+    "En yakin grid tarla olceginde bir gozlem degildir",
+    "Toprak, sulama ve yerel tarim uzmani dogrulamasi zorunludur"
+  ],
+  "sources": [
+    "https://www.fao.org/4/s2022e/s2022e07.htm",
+    "https://www.fao.org/4/Y5146E/y5146e0a.htm"
+  ]
+}

@@ -1,110 +1,74 @@
-const nasaService = require('../services/nasaService');
+﻿const algorithmService = require('../services/algorithmService');
 const weatherService = require('../services/weatherService');
-const axios = require('axios');
 
-// [Görev 4] Konum ve Analiz API'si (NASA İklim + Toprak + Aylık Göstergeler)
+function coordinates(body) {
+    const lat = body.location?.latitude ?? body.location?.lat ?? body.lat;
+    const lon = body.location?.longitude ?? body.location?.lon ?? body.lng;
+    if (typeof lat !== 'number' || typeof lon !== 'number' ||
+        !Number.isFinite(lat) || !Number.isFinite(lon) ||
+        Math.abs(lat) > 90 || Math.abs(lon) > 180) {
+        throw new Error('Geçerli enlem ve boylam gereklidir.');
+    }
+    return { latitude: lat, longitude: lon };
+}
+
+function serviceError(res, error, message) {
+    const upstreamStatus = error.response?.status;
+    const status = upstreamStatus >= 400 && upstreamStatus < 500 ? upstreamStatus : 503;
+    const detail = error.response?.data?.detail;
+    return res.status(status).json({ error: typeof detail === 'string' ? detail : message });
+}
+
+exports.getCatalog = async (_req, res) => {
+    try {
+        res.json(await algorithmService.catalog());
+    } catch (error) {
+        serviceError(res, error, 'Algorithm servisine ulaşılamadı. Ürün kataloğu yüklenemedi.');
+    }
+};
+
 exports.getLocationAnalysis = async (req, res) => {
-    const { lat, lng } = req.body;
-
-    if (!lat || !lng) {
-        return res.status(400).json({ error: "Enlem (lat) ve boylam (lng) zorunludur!" });
-    }
-
+    let location;
+    try { location = coordinates(req.body); }
+    catch (error) { return res.status(400).json({ error: error.message }); }
     try {
-        const nasaData = await nasaService.getNasaPowerData(lat, lng);
-        res.json({
-            success: true,
-            location: { lat, lng },
-            summaryIndicators: nasaData.summary, // Barbaros'un kolayca grafik çizeceği özet
-            rawDailyData: nasaData.rawDaily      // Furkan'ın modeli isterse diye günlük ham veri
-        });
+        const result = await algorithmService.predict({ location, forecast: req.body.forecast || {} });
+        res.json({ success: true, location: result.location, summaryIndicators: result.climateSummary,
+            monthlyForecasts: result.monthlyForecasts, historicalClimate: result.historicalClimate,
+            rawDailyData: null });
     } catch (error) {
-        console.error("Veri Çekme Hatası:", error.message);
-        res.status(500).json({ error: "İklim verileri alınamadı." });
+        serviceError(res, error, 'Algorithm iklim verileri alınamadı.');
     }
 };
 
-// [Görev 5 ve 6] Model Servis Entegrasyonu + Rotasyon ve Simülasyon API'si
 exports.runSimulationAndRotation = async (req, res) => {
-    const { lat, lng, farmerInputs, scenario } = req.body;
-
-    if (!lat || !lng) {
-        return res.status(400).json({ error: "Enlem (lat) ve boylam (lng) zorunludur!" });
-    }
-
+    let location;
+    try { location = coordinates(req.body); }
+    catch (error) { return res.status(400).json({ error: error.message }); }
     try {
-        const nasaData = await nasaService.getNasaPowerData(lat, lng);
-        const weatherData = await weatherService.getForecastAndTasks(lat, lng);
-
-        let modelResult = null;
-
-        // Furkan'ın Python servisine (Örn: localhost:5000/predict) bağlanmayı dener [Görev 5]
-        try {
-            const pythonResponse = await axios.post('http://localhost:5000/predict', {
-                location: { lat, lng },
-                climateSummary: nasaData.summary,
-                forecast: weatherData.forecast14Days,
-                farmerInputs: farmerInputs || { budget: "orta", irrigation: "damla", machinery: "standart" },
-                scenario: scenario || { rainChangePercent: 0, tempChange: 0 }
-            }, { timeout: 3000 }); // 3 saniye içinde yanıt gelmezse kendi yedek motoruna geçer
-
-            modelResult = pythonResponse.data;
-            console.log("🐍 Sonuç Furkan'ın Python modelinden alındı!");
-        } catch (pyError) {
-            console.log("ℹ️ Python servisi henüz bağlı değil, Dahili Karar Motoru devreye girdi.");
-            
-            // Yedek (Fallback) Karar ve Simülasyon Motoru (Senin tarafında her şeyin tam çalışması için)
-            const mayRisk = nasaData.summary.monthlyIndicators["05"]?.fungalRiskDays || 5;
-            const isHighRisk = mayRisk > 8 || (scenario && scenario.humidityIncrease > 10);
-
-            modelResult = {
-                engine: "CropGuard Hybrid Engine",
-                diseaseAnalysis: {
-                    riskStatus: isHighRisk ? "YÜKSEK MANTAR VE KÜF RİSKİ" : "ORTA / KONTROLLÜ RİSK",
-                    annualRiskDays: nasaData.summary.totalHighFungalRiskDays,
-                    criticalMonths: ["Nisan Sonu", "Mayıs Ortası"]
-                },
-                cropRecommendation: {
-                    avoidCrop: "Geleneksel Buğday / Hassas Domates (Yüksek Nem Riski)",
-                    suggestedCrop: isHighRisk ? "Nohut veya Mercimek (Mantara Dirençli & Azot Bağlayıcı)" : "Ayçiçeği / Dirençli Arpa",
-                    shiftedPlantingDate: isHighRisk ? "25 Mayıs (Geleneksel takvimden 15 gün ileri kaydırıldı)" : "12 Mayıs (8 gün ileri kaydırıldı)",
-                    expectedYieldProtection: "%28 Verim Kaybı Önleme"
-                },
-                appliedFarmerProfile: farmerInputs || "Varsayılan Çiftçi Profili",
-                appliedScenario: scenario || "Standart İklim Trendi"
-            };
-        }
-
-        res.json({
-            success: true,
-            simulationResult: modelResult,
-            upcomingTasks: weatherData.farmerTaskCalendar
+        const result = await algorithmService.predict({
+            location,
+            climateSummary: req.body.climateSummary || {},
+            forecast: req.body.forecast || {},
+            farmerInputs: req.body.farmerInputs || {},
+            scenario: req.body.scenario || {}
         });
-
+        res.json({ success: true, simulationResult: result, upcomingTasks: [] });
     } catch (error) {
-        console.error("Simülasyon Hatası:", error.message);
-        res.status(500).json({ error: "Model simülasyonu çalıştırılamadı." });
+        serviceError(res, error, 'Algorithm servisine ulaşılamadı. Tahmin ve rotasyon sonuçları alınamadı.');
     }
 };
 
-// [Görev 7] Hava Durumu ve Görev Takvimi API'si
 exports.getWeatherAndTasks = async (req, res) => {
-    const { lat, lng } = req.body;
-
-    if (!lat || !lng) {
-        return res.status(400).json({ error: "Enlem (lat) ve boylam (lng) zorunludur!" });
-    }
-
+    let location;
+    try { location = coordinates(req.body); }
+    catch (error) { return res.status(400).json({ error: error.message }); }
     try {
-        const data = await weatherService.getForecastAndTasks(lat, lng);
-        res.json({
-            success: true,
-            location: { lat, lng },
-            forecast14Days: data.forecast14Days,
-            taskCalendar: data.farmerTaskCalendar
-        });
+        const data = await weatherService.getForecastAndTasks(location.latitude, location.longitude);
+        res.json({ success: true, location, source: data.source, fetchedAt: data.fetchedAt,
+            timezone: data.timezone, forecast14Days: data.forecast14Days,
+            taskCalendar: data.farmerTaskCalendar });
     } catch (error) {
-        console.error("Hava Durumu Hatası:", error.message);
-        res.status(500).json({ error: "Hava tahmini ve görev takvimi alınamadı." });
+        serviceError(res, error, 'Günlük hava servisi veri döndürmedi. Örnek hava tahmini kullanılmadı.');
     }
 };

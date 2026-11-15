@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const apiController = require('../controllers/apiController');
 
+router.get('/catalog', apiController.getCatalog);
+
 // [Görev 4] Konum, İklim ve Toprak Analizi Ucu
 router.post('/analyze-location', apiController.getLocationAnalysis);
 

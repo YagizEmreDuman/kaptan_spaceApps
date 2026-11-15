@@ -1,4 +1,9 @@
 /* Canlı Nabız Noktası */
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .pulse-dot {
   position: absolute;
   top: -3px;

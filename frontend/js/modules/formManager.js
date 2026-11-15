@@ -21,14 +21,15 @@ export function initFormManager(onSubmitCallback) {
 
   function collectFormPayload() {
     const region = document.getElementById('region')?.value || 'konya';
-    const latitude = parseFloat(document.getElementById('lat-input')?.value) || 37.8746;
-    const longitude = parseFloat(document.getElementById('lng-input')?.value) || 32.4932;
+    const latitude = Number(document.getElementById('lat-input')?.value);
+    const longitude = Number(document.getElementById('lng-input')?.value);
+    const label = document.getElementById('region')?.selectedOptions[0]?.textContent?.trim();
 
     const soilType = document.querySelector('input[name="soilType"]:checked')?.value || 'tinli';
     const soilPh = document.getElementById('soil-ph')?.value || 'notr';
     const areaDekar = Math.max(1, Number(document.getElementById('field-area')?.value) || 120);
 
-    const targetCrop = document.getElementById('target-crop')?.value || 'bugday';
+    const targetCrop = document.getElementById('target-crop')?.value;
     const irrigation = document.getElementById('irrigation')?.value || 'damla_sulama';
     const budgetLevel = document.querySelector('input[name="budgetLevel"]:checked')?.value || 'orta';
 
@@ -37,10 +38,11 @@ export function initFormManager(onSubmitCallback) {
     );
 
     return {
-      location: { region, latitude, longitude },
+      location: { region, latitude, longitude, label },
+      forecastMonth: document.getElementById('forecast-month')?.value,
       soil: { type: soilType, ph: soilPh, areaDekar },
       cropAndResources: { targetCrop, irrigation, budgetLevel, machinery },
-      simOverrides: { rainDeltaPct: 0, humidityIncrease: 0 }
+      simOverrides: { rainDeltaPct: 0, temperatureChangeC: 0, irrigationAvailabilityChangePct: 0 }
     };
   }
 
@@ -55,6 +57,7 @@ export function initFormManager(onSubmitCallback) {
 
   if (quickDemoBtn) {
     quickDemoBtn.addEventListener('click', () => {
+      if (!form.reportValidity()) return;
       if (typeof onSubmitCallback === 'function') {
         onSubmitCallback(collectFormPayload());
       }

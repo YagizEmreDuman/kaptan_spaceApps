@@ -1,151 +1,132 @@
-import { initMapManager, refreshMapSize } from './modules/mapManager.js';
+﻿import { initMapManager, refreshMapSize } from './modules/mapManager.js';
 import { initFormManager } from './modules/formManager.js';
-import { fetchAllBackendData } from './modules/apiClient.js';
+import { fetchAllBackendData, fetchCatalog } from './modules/apiClient.js';
 import { renderClimateCharts } from './modules/chartManager.js';
 import { renderDashboardUI } from './modules/uiRenderer.js';
-import { renderSimulationPanel } from './modules/simulationPanel.js';
-import { initI18n, applyTranslations, t } from './modules/i18nManager.js';
+import { renderSimulationPanel, cancelPendingSimulation } from './modules/simulationPanel.js';
+import { initI18n, applyTranslations } from './modules/i18nManager.js';
+import { escapeHtml, formatMonth } from './modules/displayUtils.js';
+import { syncFarmSimulationContext, pauseFarmSimulation } from './modules/farmSimulation.js';
 
 let lastUsedPayload = null;
 let lastApiResult = null;
+let metadata = null;
+let analysisVersion = 0;
 
-function showScreen(screenName) {
-  const setupScreen = document.getElementById('setup-screen');
-  const loadingScreen = document.getElementById('api-loading-state');
-  const analysisScreen = document.getElementById('climate-panel');
-  const backBtn = document.getElementById('back-to-setup-btn');
-
-  setupScreen?.classList.add('hidden');
-  loadingScreen?.classList.add('hidden');
-  loadingScreen?.classList.remove('flex');
-  analysisScreen?.classList.add('hidden');
-  analysisScreen?.classList.remove('flex');
-
-  if (screenName === 'setup') {
-    setupScreen?.classList.remove('hidden');
-    backBtn?.classList.add('hidden');
-    backBtn?.classList.remove('inline-flex');
-    refreshMapSize();
-  } else if (screenName === 'loading') {
-    loadingScreen?.classList.remove('hidden');
-    loadingScreen?.classList.add('flex');
-    backBtn?.classList.remove('hidden');
-    backBtn?.classList.add('inline-flex');
-  } else if (screenName === 'analysis') {
-    analysisScreen?.classList.remove('hidden');
-    analysisScreen?.classList.add('flex');
-    backBtn?.classList.remove('hidden');
-    backBtn?.classList.add('inline-flex');
+function showScreen(name) {
+  for (const [screen, id] of [['setup', 'setup-screen'], ['loading', 'api-loading-state'], ['analysis', 'climate-panel']]) {
+    const node = document.getElementById(id);
+    node?.classList.toggle('hidden', name !== screen);
+    if (screen !== 'setup') node?.classList.toggle('flex', name === screen);
   }
+  const back = document.getElementById('back-to-setup-btn');
+  back?.classList.toggle('hidden', name === 'setup');
+  back?.classList.toggle('inline-flex', name !== 'setup');
+  if (name === 'setup') refreshMapSize();
+}
+
+function renderStatus(result, retry) {
+  const banner = document.getElementById('api-status-banner');
+  if (!banner) return;
+  banner.className = `rounded-xl px-4 py-3 border text-xs ${result.algorithmAvailable
+    ? 'border-emerald-300 bg-emerald-50 text-emerald-900' : 'border-amber-300 bg-amber-50 text-amber-900'}`;
+  banner.innerHTML = `<strong>${result.algorithmAvailable ? 'Algorithm verileri alındı' : 'Algorithm verileri alınamadı'}</strong>
+    <span> · Günlük hava: ${result.weatherAvailable ? 'servisten alındı' : 'kullanılamıyor'}</span>
+    ${result.errors.map(error => `<p class="mt-1">${escapeHtml(error)}</p>`).join('')}
+    ${result.errors.length ? '<button id="api-retry-btn" class="mt-2 underline font-semibold" type="button">Tekrar dene</button>' : ''}`;
+  document.getElementById('api-retry-btn')?.addEventListener('click', retry);
+}
+
+function renderResult(result) {
+  renderDashboardUI(result.data);
+  renderClimateCharts(result.data);
+  syncFarmSimulationContext(result.data);
+  applyTranslations();
 }
 
 function initTabs() {
-  const tabBtns = document.querySelectorAll('.tab-btn');
-  const tabPanes = document.querySelectorAll('.tab-pane');
-
-  tabBtns.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const targetId = btn.dataset.tab;
-
-      tabBtns.forEach((b) => {
-        b.className = 'tab-btn flex-1 min-w-[160px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:bg-sky-50 transition cursor-pointer';
+  document.querySelectorAll('.tab-btn').forEach(button => {
+    button.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(item => {
+        const active = item === button;
+        item.classList.toggle('bg-emerald-500', active);
+        item.classList.toggle('text-white', active);
+        item.classList.toggle('text-slate-600', !active);
       });
-      btn.className = 'tab-btn flex-1 min-w-[160px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition cursor-pointer bg-emerald-500 text-white shadow-xs';
-
-      tabPanes.forEach((pane) => {
-        if (pane.id === targetId) {
-          pane.classList.remove('hidden');
-          pane.classList.add('flex');
-        } else {
-          pane.classList.add('hidden');
-          pane.classList.remove('flex');
-        }
+      document.querySelectorAll('.tab-pane').forEach(pane => {
+        pane.classList.toggle('hidden', pane.id !== button.dataset.tab);
+        pane.classList.toggle('flex', pane.id === button.dataset.tab);
       });
-
-      // Grafik sekmesine geçildiğinde Chart.js boyutunu tazele
-      if (targetId === 'tab-simulation' && lastApiResult?.data) {
-        renderClimateCharts(
-          lastApiResult.data.profile,
-          lastApiResult.data.monthlyDrought,
-          lastApiResult.data.monthlyFungal
-        );
-      }
+      if (button.dataset.tab === 'tab-simulation' && lastApiResult) renderClimateCharts(lastApiResult.data);
     });
   });
-}
-
-function renderApiStatusBanner(result, onRetry) {
-  const banner = document.getElementById('api-status-banner');
-  if (!banner) return;
-
-  banner.classList.remove('hidden');
-
-  if (result.status === 'live') {
-    banner.className = 'rounded-xl px-3.5 py-2 border border-emerald-300 bg-emerald-50 text-emerald-900 flex items-center justify-between text-xs';
-    banner.innerHTML = `<span>🟢 <strong>Canlı Backend Bağlantısı Aktif (3/3 API)</strong></span><span class="font-mono text-[10px]">localhost:3000</span>`;
-  } else {
-    banner.className = 'rounded-xl px-3.5 py-2 border border-amber-300 bg-amber-50 text-amber-900 flex flex-wrap items-center justify-between gap-2 text-xs';
-    banner.innerHTML = `
-      <span>⚠️ <strong>Yerel Simülasyon Modu:</strong> ${result.errors[0] || 'Sunucu kapalı'}</span>
-      <button type="button" id="api-retry-btn" class="px-2.5 py-1 rounded-lg bg-amber-200 hover:bg-amber-300 text-amber-950 font-mono text-[11px] font-semibold cursor-pointer">↻ Tekrar Dene</button>
-    `;
-    document.getElementById('api-retry-btn')?.addEventListener('click', () => {
-      if (lastUsedPayload) onRetry(lastUsedPayload);
-    });
-  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  initI18n(() => {
-    if (lastApiResult?.data) {
-      renderClimateCharts(
-        lastApiResult.data.profile,
-        lastApiResult.data.monthlyDrought,
-        lastApiResult.data.monthlyFungal
-      );
-      applyTranslations();
-    }
-  });
-
+  initI18n(() => { if (lastApiResult) renderResult(lastApiResult); });
   initMapManager();
   initTabs();
 
+  async function loadCatalog() {
+    const status = document.getElementById('data-setup-status');
+    const cropSelect = document.getElementById('target-crop');
+    const monthSelect = document.getElementById('forecast-month');
+    for (const id of ['analyze-btn', 'quick-demo-btn']) document.getElementById(id).disabled = true;
+    status.textContent = 'Algorithm ürün kataloğu ve tahmin ayları yükleniyor…';
+    try {
+      metadata = await fetchCatalog();
+      cropSelect.innerHTML = metadata.crops.map(crop => `<option value="${escapeHtml(crop.id)}">${escapeHtml(crop.name)}</option>`).join('');
+      monthSelect.innerHTML = metadata.forecastMonths.map(month => `<option value="${escapeHtml(month)}">${escapeHtml(formatMonth(month))}</option>`).join('');
+      status.textContent = `${metadata.crops.length} ürün · ${metadata.forecastMonths.length} tahmin ayı · Geçmiş referansı: ${metadata.referencePeriod}. Aylık algorithm verileri Türkiye kapsamındadır.`;
+      for (const id of ['analyze-btn', 'quick-demo-btn']) document.getElementById(id).disabled = false;
+    } catch (error) {
+      metadata = null;
+      cropSelect.innerHTML = '<option value="">Ürün verisi alınamadı</option>';
+      monthSelect.innerHTML = '<option value="">Tahmin ayları alınamadı</option>';
+      status.innerHTML = `${escapeHtml(error.message)} <button type="button" id="catalog-retry-btn" class="underline font-semibold">Tekrar dene</button>`;
+      document.getElementById('catalog-retry-btn')?.addEventListener('click', loadCatalog);
+    }
+  }
+
   document.getElementById('back-to-setup-btn')?.addEventListener('click', () => {
+    pauseFarmSimulation();
+    cancelPendingSimulation();
+    analysisVersion += 1;
     showScreen('setup');
   });
 
-  async function executeAnalysis(activePayload, { onlySimulation = false, switchScreen = true } = {}) {
-    lastUsedPayload = activePayload;
-
+  async function executeAnalysis(payload, { onlySimulation = false, switchScreen = true } = {}) {
+    const version = ++analysisVersion;
+    lastUsedPayload = payload;
     if (switchScreen) showScreen('loading');
-
-    const result = await fetchAllBackendData(activePayload, {
-      onlySimulation,
-      cachedData: lastApiResult
-    });
+    else {
+      const banner = document.getElementById('api-status-banner');
+      banner.textContent = 'Algorithm sonuçları güncelleniyor…';
+      banner.classList.remove('hidden');
+    }
+    let result;
+    try {
+      result = await fetchAllBackendData(payload, { onlySimulation, cachedData: lastApiResult, metadata });
+    } catch (error) {
+      // Invalid form contracts cannot reuse previous results.
+      result = { algorithmAvailable: false, weatherAvailable: false, errors: [error.message], data: null };
+    }
+    if (version !== analysisVersion) return;
+    if (!result.data) {
+      showScreen('setup');
+      document.getElementById('data-setup-status').textContent = result.errors.join(' · ');
+      return;
+    }
     lastApiResult = result;
-
     if (switchScreen) showScreen('analysis');
-
-    renderDashboardUI(result.data);
-    renderClimateCharts(
-      result.data.profile,
-      result.data.monthlyDrought,
-      result.data.monthlyFungal
-    );
-
-    renderApiStatusBanner(result, (retryPayload) =>
-      executeAnalysis(retryPayload, { onlySimulation: false, switchScreen: true })
-    );
-
-    applyTranslations();
+    renderResult(result);
+    renderStatus(result, () => executeAnalysis(lastUsedPayload));
   }
 
-  initFormManager((initialPayload) => {
-    renderSimulationPanel(initialPayload, (simulatedPayload) => {
-      executeAnalysis(simulatedPayload, { onlySimulation: true, switchScreen: false });
-    });
-
-    executeAnalysis(initialPayload, { onlySimulation: false, switchScreen: true });
+  initFormManager(payload => {
+    if (!metadata) return;
+    renderSimulationPanel(payload, simulated => executeAnalysis(simulated, { onlySimulation: true, switchScreen: false }), metadata);
+    executeAnalysis(payload);
   });
+  loadCatalog();
 });

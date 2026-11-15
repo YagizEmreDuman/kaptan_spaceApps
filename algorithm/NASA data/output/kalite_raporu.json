@@ -1,0 +1,27 @@
+{
+  "source": "NASA POWER regional, source MERRA-2; user-provided CSV",
+  "input_grid_points": 403,
+  "turkey_grid_centers": 265,
+  "excluded_grid_centers": 138,
+  "monthly_rows": 63600,
+  "years": [
+    2006,
+    2025
+  ],
+  "baseline": "2006-2024 (19 years, not WMO 30-year normal)",
+  "missing_by_field": {
+    "precipitation_mm": 0,
+    "temperature_c": 0,
+    "soil_wetness_top": 0,
+    "soil_wetness_root": 0
+  },
+  "root_wetness_missing_grid_months": 0,
+  "rainfall_3m_start_missing": 530,
+  "notes": [
+    "Türkiye sınırında merkez noktası bulunan ızgaralar tutuldu; kıyı hücrelerinin alan ağırlığı yok.",
+    "GWETTOP/GWETROOT ıslaklık göstergeleridir; yüzde su içeriği olarak yorumlanmaz.",
+    "Eksik GWETROOT değerleri doldurulmadı.",
+    "2006-2024 referansı geçmiş yılların analizi içindir, geçmişe dönük model tahmininde veri sızıntısı yaratabilir.",
+    "Yağış anomalisinin -%20 altında olması doğrulanmış kuraklık sınıfı değildir."
+  ]
+}

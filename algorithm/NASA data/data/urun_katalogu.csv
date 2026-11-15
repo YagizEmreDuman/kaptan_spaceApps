@@ -1,0 +1,7 @@
+id,name_tr,family,water_need_min_mm,water_need_max_mm,water_source,rotation_role,water_need_note,local_validation_required
+wheat,Buğday,cereal,450,650,FAO_s2022e07,cereal,"Arpa/yulaf/buğday için FAO genel aralığı; yerel ET hesabı değildir",yes
+barley,Arpa,cereal,450,650,FAO_s2022e07,cereal,"Arpa/yulaf/buğday için FAO genel aralığı; yerel ET hesabı değildir",yes
+chickpea,Nohut,legume,,,not_established,legume_break,"Güvenilir ürün-özel sezonluk aralık bu sürümde doğrulanmadı",yes
+lentil,Mercimek,legume,,,not_established,legume_break,"Güvenilir ürün-özel sezonluk aralık bu sürümde doğrulanmadı",yes
+sunflower,Ayçiçeği,oilseed,600,1000,FAO_s2022e07,non_cereal_break,"FAO genel aralığı; yetişme dönemi ve sulama kontrol edilmeli",yes
+maize,Mısır,cereal,500,800,FAO_s2022e07,cereal,"FAO genel aralığı; sulama gereksinimi yerel koşullara bağlı",yes
