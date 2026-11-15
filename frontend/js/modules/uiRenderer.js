@@ -1,12 +1,13 @@
 import { renderPlantingTimeline } from './timelineRenderer.js';
 import { renderFarmerTaskCalendar } from './taskCalendar.js';
+import { t } from './i18nManager.js';
 
 let selectedStrategyId = 'alt1';
 
 function getTrafficLight(score) {
-  if (score >= 65) return { label: 'Yüksek Risk', badge: 'bg-rose-100 text-rose-800 border-rose-300', dot: '🔴' };
-  if (score >= 40) return { label: 'Orta Risk', badge: 'bg-amber-100 text-amber-800 border-amber-300', dot: '🟡' };
-  return { label: 'Düşük Risk', badge: 'bg-emerald-100 text-emerald-800 border-emerald-300', dot: '🟢' };
+  if (score >= 65) return { label: t('risk_high'), badge: 'bg-rose-100 text-rose-800 border-rose-300', dot: '🔴' };
+  if (score >= 40) return { label: t('risk_mid'), badge: 'bg-amber-100 text-amber-800 border-amber-300', dot: '🟡' };
+  return { label: t('risk_low'), badge: 'bg-emerald-100 text-emerald-800 border-emerald-300', dot: '🟢' };
 }
 
 export function renderDashboardUI(sim) {
@@ -28,21 +29,19 @@ export function renderDashboardUI(sim) {
   document.getElementById('report-area').textContent =
     `${payload.soil.areaDekar} da`;
 
-  // 1. Tek Cümlelik Sade Karar Özeti
   const recommended = strategies[1];
   const baseline = strategies[0];
-  const extraProfit = Math.max(0, recommended.financialTotal - baseline.financialTotal).toLocaleString('tr-TR');
+  const extraProfit = Math.max(0, recommended.financialTotal - baseline.financialTotal).toLocaleString();
 
   const heroSentenceEl = document.getElementById('decision-hero-sentence');
   if (heroSentenceEl) {
-    heroSentenceEl.innerHTML = `
-      Tarlanızda klasik ekim yerine <strong class="text-emerald-700">${recommended.plantingWindow}</strong> aralığında 
-      <strong class="text-emerald-700">${recommended.title}</strong> planına geçerseniz, hastalık riskini düşürüp sezon sonunda ortalama 
-      <strong class="bg-amber-100 text-amber-900 px-2 py-0.5 rounded">+${extraProfit} ₺ ek kazanç</strong> sağlayabilirsiniz.
-    `;
+    heroSentenceEl.innerHTML = t('hero_sentence', {
+      window: recommended.plantingWindow,
+      title: recommended.title,
+      profit: extraProfit
+    });
   }
 
-  // 2. Trafik Işığı Risk Özeti Rozetleri
   const fungalLight = getTrafficLight(peakFungal);
   const droughtLight = getTrafficLight(peakDrought);
   const frostLight = getTrafficLight(frostRisk);
@@ -51,13 +50,13 @@ export function renderDashboardUI(sim) {
   if (badgesEl) {
     badgesEl.innerHTML = `
       <span class="text-xs font-semibold px-3 py-1 rounded-full border ${fungalLight.badge}">
-        ${fungalLight.dot} Mantar Riski: ${fungalLight.label} (%${peakFungal})
+        ${fungalLight.dot} ${t('risk_fungal_lbl')}: ${fungalLight.label} (%${peakFungal})
       </span>
       <span class="text-xs font-semibold px-3 py-1 rounded-full border ${droughtLight.badge}">
-        ${droughtLight.dot} Kuraklık: ${droughtLight.label} (%${peakDrought})
+        ${droughtLight.dot} ${t('risk_drought_lbl')}: ${droughtLight.label} (%${peakDrought})
       </span>
       <span class="text-xs font-semibold px-3 py-1 rounded-full border ${frostLight.badge}">
-        ${frostLight.dot} Don Riski: ${frostLight.label} (%${frostRisk})
+        ${frostLight.dot} ${t('risk_frost_lbl')}: ${frostLight.label} (%${frostRisk})
       </span>
     `;
   }
@@ -66,7 +65,7 @@ export function renderDashboardUI(sim) {
   renderSelectedStrategyDetail(strategies);
   renderPlantingTimeline(sim, selectedStrategyId);
   renderFarmerTaskCalendar(sim, selectedStrategyId);
-  renderAgronomyAlerts(payload, profile);
+  renderAgronomyAlerts(profile);
 }
 
 function renderRotationCards(sim) {
@@ -85,27 +84,27 @@ function renderRotationCards(sim) {
           <div class="flex items-center justify-between gap-1 mb-2">
             <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded border ${st.badgeClass}">${st.badge}</span>
             <span class="text-[11px] font-bold ${isSelected ? 'text-emerald-700' : 'text-slate-400'}">
-              ${isSelected ? '✓ Seçili' : 'Seç'}
+              ${isSelected ? t('card_selected') : t('card_select')}
             </span>
           </div>
 
           <h4 class="text-sm font-bold text-slate-900 leading-snug">${st.title}</h4>
 
           <div class="mt-3 p-2.5 rounded-xl bg-sky-50/80 border border-sky-200 flex flex-col gap-1">
-            <span class="text-[10px] text-slate-500">Önerilen Ekim Zamanı</span>
+            <span class="text-[10px] text-slate-500">${t('card_planting_win')}</span>
             <span class="text-xs font-mono font-bold text-sky-900">${st.plantingWindow}</span>
           </div>
 
           <div class="mt-2.5 flex items-center justify-between text-xs">
-            <span class="text-slate-500">Genel Risk:</span>
+            <span class="text-slate-500">${t('card_general_risk')}</span>
             <span class="font-semibold">${riskLight.dot} ${riskLight.label}</span>
           </div>
         </div>
 
         <div class="border-t border-slate-200 pt-3 flex items-center justify-between">
           <div>
-            <div class="text-[10px] text-slate-500">Tahmini Getiri</div>
-            <div class="text-sm font-mono font-bold text-slate-900">${st.financialTotal.toLocaleString('tr-TR')} ₺</div>
+            <div class="text-[10px] text-slate-500">${t('card_est_revenue')}</div>
+            <div class="text-sm font-mono font-bold text-slate-900">${st.financialTotal.toLocaleString()} ₺</div>
           </div>
           <span class="text-[11px] font-mono font-bold px-2 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800">
             ${st.yieldDeltaText}
@@ -134,36 +133,36 @@ function renderSelectedStrategyDetail(strategies) {
 
   detailBox.innerHTML = `
     <div class="flex flex-wrap items-center justify-between gap-2">
-      <h4 class="text-xs sm:text-sm font-bold text-slate-900">📌 Seçili Plan Detayı: ${st.title}</h4>
+      <h4 class="text-xs sm:text-sm font-bold text-slate-900">${t('detail_title')} ${st.title}</h4>
       <span class="text-xs font-mono font-bold text-emerald-700">${st.financialDiffText}</span>
     </div>
     <p class="text-xs text-slate-700 leading-relaxed">${st.reason}</p>
     <div class="flex flex-wrap gap-2 text-[11px]">
-      <span class="px-2.5 py-1 rounded-lg bg-white border border-slate-200 font-medium">🔄 3 Sezon: <strong>${st.sequence.join(' → ')}</strong></span>
-      <span class="px-2.5 py-1 rounded-lg bg-white border border-slate-200 font-medium">💧 Su Tasarrufu: <strong>%${st.waterSaving}</strong></span>
+      <span class="px-2.5 py-1 rounded-lg bg-white border border-slate-200 font-medium">${t('detail_seq')} <strong>${st.sequence.join(' → ')}</strong></span>
+      <span class="px-2.5 py-1 rounded-lg bg-white border border-slate-200 font-medium">${t('detail_water')} <strong>%${st.waterSaving}</strong></span>
     </div>
   `;
 }
 
-function renderAgronomyAlerts(payload, profile) {
+function renderAgronomyAlerts(profile) {
   const alertsContainer = document.getElementById('agronomy-alerts-list');
   if (!alertsContainer) return;
 
   const alerts = [
     {
       icon: '🌡️',
-      title: `GDD Fenoloji Kayması (${profile.gddShift})`,
-      desc: 'Isınma trendi bitkinin gelişim evrelerini öne çekiyor; erken ekim sıcak dalgasından kaçışı sağlar.'
+      title: t('alert_gdd_title', { shift: profile.gddShift }),
+      desc: t('alert_gdd_desc')
     },
     {
       icon: '💨',
-      title: `Sıcak Dalgası (${profile.heatWaveDays})`,
-      desc: 'Yüksek sıcaklık tozlaşma verimini düşürebilir; erken hasat penceresi bu riski azaltır.'
+      title: t('alert_heat_title', { days: profile.heatWaveDays }),
+      desc: t('alert_heat_desc')
     },
     {
       icon: '🧪',
-      title: payload.soil.ph === 'alkali' ? 'Alkali Toprak Mikro Besin Desteği' : 'Toprak Nem Dengesi',
-      desc: 'Tohumun kök salma döneminde yüzey buharlaşmasını azaltmak için minimum toprak işleme önerilir.'
+      title: t('alert_soil_title'),
+      desc: t('alert_soil_desc')
     }
   ];
 

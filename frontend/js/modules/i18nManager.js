@@ -7,9 +7,13 @@ export function getCurrentLang() {
   return currentLang;
 }
 
-export function t(key) {
+export function t(key, vars = {}) {
   const dict = TRANSLATIONS[currentLang] || TRANSLATIONS.tr;
-  return dict[key] ?? TRANSLATIONS.tr[key] ?? key;
+  let str = dict[key] ?? TRANSLATIONS.tr[key] ?? key;
+  for (const [k, v] of Object.entries(vars)) {
+    str = str.replaceAll(`{${k}}`, String(v));
+  }
+  return str;
 }
 
 export function getLocalizedMonths() {
@@ -25,6 +29,14 @@ export function applyTranslations() {
     const translated = t(key);
     if (translated) {
       el.textContent = translated;
+    }
+  });
+
+  document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    const translated = t(key);
+    if (translated) {
+      el.setAttribute('placeholder', translated);
     }
   });
 }

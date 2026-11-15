@@ -4,6 +4,7 @@ import { fetchAllBackendData } from './modules/apiClient.js';
 import { renderClimateCharts } from './modules/chartManager.js';
 import { renderDashboardUI } from './modules/uiRenderer.js';
 import { renderSimulationPanel } from './modules/simulationPanel.js';
+import { runAgronomySimulation } from './modules/riskCalculator.js';
 import { initI18n, applyTranslations, t } from './modules/i18nManager.js';
 
 let lastUsedPayload = null;
@@ -62,7 +63,6 @@ function initTabs() {
         }
       });
 
-      // Grafik sekmesine geçildiğinde Chart.js boyutunu tazele
       if (targetId === 'tab-simulation' && lastApiResult?.data) {
         renderClimateCharts(
           lastApiResult.data.profile,
@@ -82,12 +82,12 @@ function renderApiStatusBanner(result, onRetry) {
 
   if (result.status === 'live') {
     banner.className = 'rounded-xl px-3.5 py-2 border border-emerald-300 bg-emerald-50 text-emerald-900 flex items-center justify-between text-xs';
-    banner.innerHTML = `<span>🟢 <strong>Canlı Backend Bağlantısı Aktif (3/3 API)</strong></span><span class="font-mono text-[10px]">localhost:3000</span>`;
+    banner.innerHTML = `<span>🟢 <strong>${t('api_live')}</strong></span><span class="font-mono text-[10px]">localhost:3000</span>`;
   } else {
     banner.className = 'rounded-xl px-3.5 py-2 border border-amber-300 bg-amber-50 text-amber-900 flex flex-wrap items-center justify-between gap-2 text-xs';
     banner.innerHTML = `
-      <span>⚠️ <strong>Yerel Simülasyon Modu:</strong> ${result.errors[0] || 'Sunucu kapalı'}</span>
-      <button type="button" id="api-retry-btn" class="px-2.5 py-1 rounded-lg bg-amber-200 hover:bg-amber-300 text-amber-950 font-mono text-[11px] font-semibold cursor-pointer">↻ Tekrar Dene</button>
+      <span>⚠️ <strong>${t('api_local')}</strong> ${result.errors[0] || t('api_offline')}</span>
+      <button type="button" id="api-retry-btn" class="px-2.5 py-1 rounded-lg bg-amber-200 hover:bg-amber-300 text-amber-950 font-mono text-[11px] font-semibold cursor-pointer">${t('api_retry')}</button>
     `;
     document.getElementById('api-retry-btn')?.addEventListener('click', () => {
       if (lastUsedPayload) onRetry(lastUsedPayload);
@@ -96,24 +96,6 @@ function renderApiStatusBanner(result, onRetry) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  initI18n(() => {
-    if (lastApiResult?.data) {
-      renderClimateCharts(
-        lastApiResult.data.profile,
-        lastApiResult.data.monthlyDrought,
-        lastApiResult.data.monthlyFungal
-      );
-      applyTranslations();
-    }
-  });
-
-  initMapManager();
-  initTabs();
-
-  document.getElementById('back-to-setup-btn')?.addEventListener('click', () => {
-    showScreen('setup');
-  });
-
   async function executeAnalysis(activePayload, { onlySimulation = false, switchScreen = true } = {}) {
     lastUsedPayload = activePayload;
 
@@ -140,6 +122,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
     applyTranslations();
   }
+
+  // Dil değiştiğinde hem kurulum ekranını hem de açıksa analiz ekranındaki tüm kartları/grafikleri anında yeniden çiz
+  initI18n(() => {
+    const activeSoil = document.querySelector('input[name="soilType"]:checked')?.value || 'tinli';
+    const soilHintEl = document.getElementById('soil-risk-hint');
+    if (soilHintEl) soilHintEl.textContent = t(`soil_hint_${activeSoil}`);
+
+    if (lastUsedPayload && lastApiResult?.data) {
+      const localizedSim = runAgronomySimulation(lastUsedPayload);
+      localizedSim.profile.rain2026 = lastApiResult.data.profile.rain2026;
+      localizedSim.profile.rainHist = lastApiResult.data.profile.rainHist;
+      localizedSim.profile.temp2026 = lastApiResult.data.profile.temp2026;
+      localizedSim.monthlyDrought = lastApiResult.data.monthlyDrought;
+      localizedSim.monthlyFungal = lastApiResult.data.monthlyFungal;
+      lastApiResult.data = localizedSim;
+
+      renderSimulationPanel(lastUsedPayload, (simulatedPayload) => {
+        executeAnalysis(simulatedPayload, { onlySimulation: true, switchScreen: false });
+      });
+      renderDashboardUI(localizedSim);
+      renderClimateCharts(
+        localizedSim.profile,
+        localizedSim.monthlyDrought,
+        localizedSim.monthlyFungal
+      );
+      renderApiStatusBanner(lastApiResult, (retryPayload) =>
+        executeAnalysis(retryPayload, { onlySimulation: false, switchScreen: true })
+      );
+    }
+    applyTranslations();
+  });
+
+  initMapManager();
+  initTabs();
+
+  document.getElementById('back-to-setup-btn')?.addEventListener('click', () => {
+    showScreen('setup');
+  });
 
   initFormManager((initialPayload) => {
     renderSimulationPanel(initialPayload, (simulatedPayload) => {

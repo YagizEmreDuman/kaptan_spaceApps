@@ -1,4 +1,4 @@
-import { getLocalizedMonths } from './i18nManager.js';
+import { getLocalizedMonths, t } from './i18nManager.js';
 
 let tempRainChartInstance = null;
 let riskIndexChartInstance = null;
@@ -6,7 +6,8 @@ let riskIndexChartInstance = null;
 export function renderClimateCharts(profile, monthlyDrought, monthlyFungal) {
   const months = getLocalizedMonths();
 
-  const ctx1 = document.getElementById('tempRainChart').getContext('2d');
+  const ctx1 = document.getElementById('tempRainChart')?.getContext('2d');
+  if (!ctx1) return;
   if (tempRainChartInstance) tempRainChartInstance.destroy();
 
   tempRainChartInstance = new Chart(ctx1, {
@@ -15,28 +16,28 @@ export function renderClimateCharts(profile, monthlyDrought, monthlyFungal) {
       labels: months,
       datasets: [
         {
-          label: '2026 Yağış (mm)',
+          label: t('chart_rain_2026'),
           data: profile.rain2026,
-          backgroundColor: 'rgba(14, 165, 233, 0.78)', // Gökyüzü Mavisi
+          backgroundColor: 'rgba(14, 165, 233, 0.78)',
           borderColor: '#0284c7',
           borderWidth: 1,
           borderRadius: 5,
           yAxisID: 'y'
         },
         {
-          label: 'Tarihsel Yağış (mm)',
+          label: t('chart_rain_hist'),
           data: profile.rainHist,
-          backgroundColor: 'rgba(186, 230, 253, 0.85)', // Açık Buz Mavisi
+          backgroundColor: 'rgba(186, 230, 253, 0.85)',
           borderColor: '#7dd3fc',
           borderWidth: 1,
           borderRadius: 5,
           yAxisID: 'y'
         },
         {
-          label: 'Ort. Sıcaklık (°C)',
+          label: t('chart_temp_2026'),
           data: profile.temp2026,
           type: 'line',
-          borderColor: '#eab308', // Güneş Sarısı
+          borderColor: '#eab308',
           backgroundColor: '#fef08a',
           borderWidth: 2.5,
           tension: 0.35,
@@ -76,7 +77,8 @@ export function renderClimateCharts(profile, monthlyDrought, monthlyFungal) {
     }
   });
 
-  const ctx2 = document.getElementById('riskIndexChart').getContext('2d');
+  const ctx2 = document.getElementById('riskIndexChart')?.getContext('2d');
+  if (!ctx2) return;
   if (riskIndexChartInstance) riskIndexChartInstance.destroy();
 
   riskIndexChartInstance = new Chart(ctx2, {
@@ -85,9 +87,9 @@ export function renderClimateCharts(profile, monthlyDrought, monthlyFungal) {
       labels: months,
       datasets: [
         {
-          label: 'Kuraklık & Sıcak Stresi (%)',
+          label: t('chart_drought_risk'),
           data: monthlyDrought,
-          borderColor: '#eab308', // Güneş Sarısı / Kehribar
+          borderColor: '#eab308',
           backgroundColor: 'rgba(254, 240, 138, 0.45)',
           fill: true,
           tension: 0.35,
@@ -95,9 +97,9 @@ export function renderClimateCharts(profile, monthlyDrought, monthlyFungal) {
           pointRadius: 3
         },
         {
-          label: 'Mantar / Patojen Riski (%)',
+          label: t('chart_fungal_risk'),
           data: monthlyFungal,
-          borderColor: '#16a34a', // Taze Çayır Yeşili
+          borderColor: '#16a34a',
           backgroundColor: 'rgba(187, 247, 208, 0.45)',
           fill: true,
           tension: 0.35,
