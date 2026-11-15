@@ -25,7 +25,7 @@ body {
   font-family: 'JetBrains Mono', monospace;
 }
 
-/* Saf Beyaz & Yumuşak Gölgeli Cam Kartlar */
+/* Pure White & Soft-Shadow Glass Cards */
 .glass-panel {
   background: rgba(255, 255, 255, 0.94) !important;
   backdrop-filter: blur(12px);
@@ -33,7 +33,7 @@ body {
   box-shadow: 0 10px 28px -8px rgba(14, 116, 144, 0.08), 0 4px 10px -4px rgba(22, 163, 74, 0.06) !important;
 }
 
-/* JS Modüllerinden Gelen Koyu Sınıfları Otomatik Aydınlık Tarım Temasına Çevir */
+/* Automatically Convert Dark Classes from JS Modules to Light Agriculture Theme */
 .bg-slate-950,
 .bg-slate-950\/70,
 .bg-slate-950\/75,
@@ -61,7 +61,7 @@ body {
   background-color: #e0f2fe !important;
 }
 
-/* Metin Kontrast Dönüşümleri */
+/* Text Contrast Conversions */
 .glass-panel .text-white,
 [class*="bg-slate-9"] .text-white,
 header .text-white {
@@ -88,7 +88,7 @@ header .text-white {
   color: #64748b !important;
 }
 
-/* Pastel Vurgu Renklerinin Beyaz Zeminde Okunabilirliği */
+/* Readability of Pastel Accent Colors on White Background */
 .text-emerald-400,
 .text-emerald-300 {
   color: #15803d !important;
@@ -116,7 +116,7 @@ header .text-white {
   color: #be123c !important;
 }
 
-/* Çerçeve (Border) Dönüşümleri */
+/* Border Conversions */
 .border-slate-800,
 .border-slate-800\/90,
 .border-slate-800\/80,
@@ -128,7 +128,7 @@ header .text-white {
   border-color: #cbd5e1 !important;
 }
 
-/* Güneş Sarısı ve Gökyüzü Mavisi Yumuşak Kutu Arka Planları */
+/* Sun Yellow and Sky Blue Soft Box Backgrounds */
 .bg-amber-500\/15,
 .bg-amber-500\/10,
 .bg-amber-950\/30 {
@@ -159,7 +159,7 @@ header .text-white {
   border-color: #fda4af !important;
 }
 
-/* Özel Açık Tema Kaydırma Çubuğu */
+/* Custom Light Theme Scrollbar */
 ::-webkit-scrollbar {
   width: 7px;
   height: 7px;

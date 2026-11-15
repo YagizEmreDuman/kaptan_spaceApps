@@ -1,15 +1,14 @@
 import { TRANSLATIONS } from '../data/translations.js';
 
-const STORAGE_KEY = 'cropguard_lang';
-let currentLang = (typeof localStorage !== 'undefined' && localStorage.getItem(STORAGE_KEY)) || 'tr';
+const currentLang = 'en';
 
 export function getCurrentLang() {
   return currentLang;
 }
 
 export function t(key, vars = {}) {
-  const dict = TRANSLATIONS[currentLang] || TRANSLATIONS.tr;
-  let str = dict[key] ?? TRANSLATIONS.tr[key] ?? key;
+  const dict = TRANSLATIONS.en;
+  let str = dict[key] ?? key;
   for (const [k, v] of Object.entries(vars)) {
     str = str.replaceAll(`{${k}}`, String(v));
   }
@@ -17,12 +16,14 @@ export function t(key, vars = {}) {
 }
 
 export function getLocalizedMonths() {
-  const dict = TRANSLATIONS[currentLang] || TRANSLATIONS.tr;
-  return dict.months || TRANSLATIONS.tr.months;
+  return TRANSLATIONS.en.months;
 }
 
 export function applyTranslations() {
-  document.documentElement.lang = currentLang;
+  if (typeof document === 'undefined' || !document.querySelectorAll) return;
+  if (document.documentElement) {
+    document.documentElement.lang = currentLang;
+  }
 
   document.querySelectorAll('[data-i18n]').forEach((el) => {
     const key = el.getAttribute('data-i18n');
@@ -41,21 +42,6 @@ export function applyTranslations() {
   });
 }
 
-export function initI18n(onLanguageChangeCallback) {
-  const switcher = document.getElementById('language-switcher');
-
-  if (switcher) {
-    switcher.value = currentLang;
-    switcher.addEventListener('change', (e) => {
-      currentLang = e.target.value;
-      localStorage.setItem(STORAGE_KEY, currentLang);
-      applyTranslations();
-
-      if (typeof onLanguageChangeCallback === 'function') {
-        onLanguageChangeCallback(currentLang);
-      }
-    });
-  }
-
+export function initI18n() {
   applyTranslations();
 }

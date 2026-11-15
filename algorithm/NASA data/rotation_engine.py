@@ -60,21 +60,21 @@ def assess_rotation(payload: dict[str, Any]) -> dict[str, Any]:
         same_family = first['family'] == second['family']
         explanations = []
         if legume_break:
-            explanations.append('Tahildan sonra baklagil eklemek, uygun yerel kosullarda hastalik dongusunu kesmeye ve azot dongusune katki saglamaya yardimci olabilir.')
+            explanations.append('Planting a legume after cereal can help break disease cycles and contribute to nitrogen cycling under suitable local conditions.')
         if same_family:
-            explanations.append('Ayni bitki ailesinin tekrarinda hastalik ve besin dengesi riskleri yerel olarak kontrol edilmelidir.')
+            explanations.append('Repeating the same plant family requires local inspection of disease and nutrient balance risks.')
         if not same_family and not legume_break:
-            explanations.append('Bitki ailesi cesitliligi saglar; ancak bunun faydasi tarlaya ozgu kosullara baglidir.')
+            explanations.append('Provides plant family diversity; however, its benefit depends on field-specific conditions.')
         water_info = []
-        cautions = ['Toprak pH, tekstur, drenaj ve ekim-hasat takvimi bilinmiyor.', 'Hastalik/zararli gecmisi, pazar ve ekipman uygunlugu yerelde dogrulanmali.']
+        cautions = ['Soil pH, texture, drainage, and planting-harvest schedule are unknown.', 'Disease/pest history, market, and equipment suitability must be verified locally.']
         for c in (first, second):
             range_known = c['water_need_min_mm'] is not None
             exceeds = bool(max_et is not None and range_known and c['water_need_min_mm'] > max_et)
             water_info.append({'crop': c['id'], 'seasonalEtGuideMm': [c['water_need_min_mm'], c['water_need_max_mm']] if range_known else None, 'lowerBoundExceedsUserEtLimit': exceeds})
             if not range_known:
-                cautions.append(f"{c['name_tr']} icin urun-ozel su ihtiyaci araligi eksik; uygunluk hesaplanmadi.")
+                cautions.append(f"Crop-specific water need range missing for {c['name_tr']}; suitability not calculated.")
             elif exceeds:
-                cautions.append(f"{c['name_tr']} icin FAO sezonluk ET alt siniri kullanicinin belirttigi limitin ustunde; bu sulama ihtiyaci hesaplamasi degildir.")
+                cautions.append(f"FAO seasonal ET lower bound for {c['name_tr']} exceeds user-specified limit; this is not an irrigation requirement calculation.")
         strategies.append({
             'id': 'current' if i == 0 else f'alternative_{i}',
             'type': 'current' if i == 0 else 'alternative',
@@ -88,15 +88,15 @@ def assess_rotation(payload: dict[str, Any]) -> dict[str, Any]:
             'ranking': None,
         })
     warnings = [
-        'Bunlar aciklanabilir rotasyon senaryolaridir; tarla bazinda dogrulanmis oneriler degildir.',
-        'FAO sezonluk urun ET rehberleri sulama gereksinimi veya yagisla tek basina karsilastirilabilecek esikler degildir.',
-        'Mevcut NASA GEOS-S2S dosyalarinda gelecege yonelik yagis tahmini bulunmuyor.',
-        'WET3 tahminleri gecmis POWER GWETROOT ile dogrudan karsilastirilamaz.'
+        'These are explainable rotation scenarios, not field-validated prescriptions.',
+        'FAO seasonal crop ET guides are not irrigation requirements or thresholds directly comparable with rainfall alone.',
+        'No future precipitation forecast is available in the raw NASA GEOS-S2S NetCDF files.',
+        'WET3 forecasts cannot be directly compared with historical POWER GWETROOT.'
     ]
     if rainfall_change is not None:
-        warnings.append(f'Senaryoda yagis %{rainfall_change:+g} degisimi kullanici varsayimidir; NASA tahmini degildir. Bu surumde rotasyon uygunluguna sayisal etki olarak uygulanmaz.')
+        warnings.append(f'Scenario rainfall change of {rainfall_change:+g}% is a user assumption, not a NASA forecast.')
     if len(strategies) < 3:
-        warnings.append('Kullanici tarafindan izin verilen urunlerle uc farkli strateji olusturulamadi.')
+        warnings.append('Could not generate three distinct strategies with user-permitted crops.')
     return {
         'rotationStrategies': strategies,
         'rotationAssessmentStatus': 'exploratory_rule_based_not_trained_ml',

@@ -31,10 +31,10 @@ function renderStatus(result, retry) {
   if (!banner) return;
   banner.className = `rounded-xl px-4 py-3 border text-xs ${result.algorithmAvailable
     ? 'border-emerald-300 bg-emerald-50 text-emerald-900' : 'border-amber-300 bg-amber-50 text-amber-900'}`;
-  banner.innerHTML = `<strong>${result.algorithmAvailable ? 'Algorithm verileri alındı' : 'Algorithm verileri alınamadı'}</strong>
-    <span> · Günlük hava: ${result.weatherAvailable ? 'servisten alındı' : 'kullanılamıyor'}</span>
+  banner.innerHTML = `<strong>${result.algorithmAvailable ? 'Algorithm data loaded' : 'Algorithm data unavailable'}</strong>
+    <span> · Daily weather: ${result.weatherAvailable ? 'loaded from service' : 'unavailable'}</span>
     ${result.errors.map(error => `<p class="mt-1">${escapeHtml(error)}</p>`).join('')}
-    ${result.errors.length ? '<button id="api-retry-btn" class="mt-2 underline font-semibold" type="button">Tekrar dene</button>' : ''}`;
+    ${result.errors.length ? '<button id="api-retry-btn" class="mt-2 underline font-semibold" type="button">Retry</button>' : ''}`;
   document.getElementById('api-retry-btn')?.addEventListener('click', retry);
 }
 
@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (prevMonth && cat.forecastMonths.includes(prevMonth)) monthSelect.value = prevMonth;
     }
     if (status) {
-      status.textContent = `${cat.crops.length} ürün · ${cat.forecastMonths.length} tahmin ayı · Geçmiş referansı: ${cat.referencePeriod}. Aylık algorithm verileri Türkiye kapsamındadır.`;
+      status.textContent = `${cat.crops.length} crops · ${cat.forecastMonths.length} forecast months · Historical baseline: ${cat.referencePeriod}. Monthly algorithm data covers Turkey.`;
     }
     for (const id of ['analyze-btn', 'quick-demo-btn']) {
       const btn = document.getElementById(id);
@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (switchScreen) showScreen('loading');
     else {
       const banner = document.getElementById('api-status-banner');
-      banner.textContent = 'Algorithm sonuçları güncelleniyor…';
+      banner.textContent = 'Updating algorithm results…';
       banner.classList.remove('hidden');
     }
     let result;

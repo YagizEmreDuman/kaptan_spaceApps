@@ -4,13 +4,13 @@ const apiController = require('../controllers/apiController');
 
 router.get('/catalog', apiController.getCatalog);
 
-// [Görev 4] Konum, İklim ve Toprak Analizi Ucu
+// Location, Climate & Soil Analysis Endpoint
 router.post('/analyze-location', apiController.getLocationAnalysis);
 
-// [Görev 5 & 6] Model Tahmini, Rotasyon ve Senaryo Simülasyonu Ucu
+// Model Forecast, Rotation & Scenario Simulation Endpoint
 router.post('/simulate-rotation', apiController.runSimulationAndRotation);
 
-// [Görev 7] 14 Günlük Hava Durumu ve Çiftçi Görev Takvimi Ucu
+// 14-Day Weather Forecast & Farmer Task Calendar Endpoint
 router.post('/weather-tasks', apiController.getWeatherAndTasks);
 
 module.exports = router;

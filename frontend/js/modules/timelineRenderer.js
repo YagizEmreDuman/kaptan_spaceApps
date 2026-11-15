@@ -14,16 +14,16 @@ export function renderPlantingTimeline(sim, selectedStrategyId) {
   const strategy = sim.strategies.find(item => item.id === selectedStrategyId) || sim.strategies[0];
 
   if (!isBrowser) {
-    box.innerHTML = `<h3 class="text-sm font-bold text-slate-900">Rotasyon sırası</h3>
+    box.innerHTML = `<h3 class="text-sm font-bold text-slate-900">Rotation sequence</h3>
       ${strategy ? `<div class="flex flex-wrap items-center gap-3">${strategy.sequence.map((name, index) =>
-        `<div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4"><span class="text-xs text-slate-500">${index + 1}. ürün</span><p class="text-sm font-semibold">${esc(name)}</p></div>`
-      ).join('<span aria-hidden="true">→</span>')}</div>` : '<p class="text-xs text-slate-600">Rotasyon sırası alınamadı.</p>'}
-      <p class="text-xs text-slate-500">Algorithm ekim ve hasat tarihi üretmiyor. Takvim tarihleri için veri bulunmuyor.</p>`;
+        `<div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4"><span class="text-xs text-slate-500">Crop ${index + 1}</span><p class="text-sm font-semibold">${esc(name)}</p></div>`
+      ).join('<span aria-hidden="true">→</span>')}</div>` : '<p class="text-xs text-slate-600">Rotation sequence unavailable.</p>'}
+      <p class="text-xs text-slate-500">Algorithm does not generate planting and harvest dates. No data available for calendar dates.</p>`;
     return;
   }
 
   if (!strategy) {
-    box.innerHTML = '<p class="text-xs text-slate-600">Rotasyon sırası alınamadı.</p>';
+    box.innerHTML = '<p class="text-xs text-slate-600">Rotation sequence unavailable.</p>';
     return;
   }
 
@@ -31,16 +31,16 @@ export function renderPlantingTimeline(sim, selectedStrategyId) {
   const seqIds = Array.isArray(strategy.cropSequence) ? strategy.cropSequence : [];
   const activeCropId = (strategy.type === 'current' ? seqIds[0] : seqIds[1]) || sim.payload?.cropAndResources?.targetCrop || 'wheat';
   const isSpringCrop = ['maize', 'sunflower', 'chickpea'].includes(activeCropId);
-  const windowLabel = strategy.plantingWindow || (isSpringCrop ? 'Mart – Nisan' : 'Eylül – Ekim');
+  const windowLabel = strategy.plantingWindow || (isSpringCrop ? 'March – April' : 'September – October');
 
   const soilType = sim.payload?.soil?.type || 'tinli';
-  const soilLabel = sim.soilLabel || 'Tınlı Toprak';
+  const soilLabel = sim.soilLabel || 'Loamy Soil';
   const irrigation = sim.payload?.cropAndResources?.irrigation || 'kuru_tarim';
   const irrigLabel =
-    irrigation === 'damla_sulama' ? 'Damla Sulama'
-    : irrigation === 'yagmurlama' ? 'Yağmurlama'
-    : irrigation === 'salma_sulama' ? 'Salma Sulama'
-    : 'Kuru Tarım';
+    irrigation === 'damla_sulama' ? 'Drip Irrigation'
+    : irrigation === 'yagmurlama' ? 'Sprinkler Irrigation'
+    : irrigation === 'salma_sulama' ? 'Flood Irrigation'
+    : 'Dry Farming (Rainfed)';
 
   const mf = sim.monthlyForecasts || [];
   const nov = findMonthForecast(mf, '2026-11');
@@ -52,109 +52,109 @@ export function renderPlantingTimeline(sim, selectedStrategyId) {
   const jul = findMonthForecast(mf, '2027-07');
 
   const soilPrepNote =
-    soilType === 'killi' ? `${soilLabel}: ağır tavda sıkışmayı önlemek için çizel ile derin havalandırma.`
-    : soilType === 'kumlu' ? `${soilLabel}: nem kaybını azaltmak için minimum sürüm ve organik madde takviyesi.`
-    : soilType === 'kirecli' ? `${soilLabel}: fosfor kilitlenmesine karşı kükürtlü/mikro elementli taban gübresi.`
-    : `${soilLabel}: dengeli tohum yatağı hazırlığı ve taban gübresi uygulaması.`;
+    soilType === 'killi' ? `${soilLabel}: deep chisel aeration to prevent compaction under heavy moisture.`
+    : soilType === 'kumlu' ? `${soilLabel}: minimum tillage and organic matter supplementation to reduce moisture loss.`
+    : soilType === 'kirecli' ? `${soilLabel}: sulfur and micronutrient-enriched base fertilizer against phosphorus lock-up.`
+    : `${soilLabel}: balanced seedbed preparation and base fertilizer application.`;
 
   const milestones = isSpringCrop
     ? [
         {
           m: `${months[1]} – ${months[2]}`,
-          title: 'Toprak Hazırlığı & Tav Kontrolü',
-          desc: `${soilPrepNote} (${feb ? `Şubat ort: ${num(feb.temperatureC)} °C, yağış: ${num(feb.precipitationMm)} mm` : ''})`,
+          title: 'Soil Preparation & Moisture Check',
+          desc: `${soilPrepNote} (${feb ? `Feb avg: ${num(feb.temperatureC)} °C, rain: ${num(feb.precipitationMm)} mm` : ''})`,
           color: 'bg-sky-500'
         },
         {
           m: windowLabel,
-          title: 'Dinamik Optimum Ekim Penceresi',
-          desc: `${strategy.sequence[1] || strategy.sequence[0]} tohum ekimi (${irrigLabel} · Su tasarruf hedefi: %${num(strategy.waterSaving)}).`,
+          title: 'Dynamic Optimal Planting Window',
+          desc: `${strategy.sequence[1] || strategy.sequence[0]} sowing (${irrigLabel} · Water saving target: ${num(strategy.waterSaving)}%).`,
           color: 'bg-emerald-500'
         },
         {
           m: months[3],
-          title: 'Çimlenme & Kök Gelişimi',
-          desc: `Nisan NASA tahmini: ${apr ? `${num(apr.temperatureC)} °C, yağış ${num(apr.precipitationMm)} mm, kök nemi WET3: ${num(apr.soilWetnessWet3Index, 2)}` : 'toprak nemi takibi'}.`,
+          title: 'Germination & Root Establishment',
+          desc: `April NASA forecast: ${apr ? `${num(apr.temperatureC)} °C, rain ${num(apr.precipitationMm)} mm, root moisture WET3: ${num(apr.soilWetnessWet3Index, 2)}` : 'soil moisture monitoring'}.`,
           color: 'bg-emerald-400'
         },
         {
           m: months[4],
-          title: 'Vejetatif Gelişim & Üst Besleme',
-          desc: `Mayıs NASA tahmini: ${may ? `${num(may.temperatureC)} °C, yağış ${num(may.precipitationMm)} mm` : ''} — ${soilLabel} yapısına uygun üst gübreleme.`,
+          title: 'Vegetative Growth & Top-Dressing',
+          desc: `May NASA forecast: ${may ? `${num(may.temperatureC)} °C, rain ${num(may.precipitationMm)} mm` : ''} — top-dressing tailored for ${soilLabel}.`,
           color: 'bg-sky-500'
         },
         {
           m: months[5],
-          title: 'Çiçeklenme & Su Stresi Kalkanı',
-          desc: `Haziran NASA tahmini: ${jun ? `${num(jun.temperatureC)} °C, WET3: ${num(jun.soilWetnessWet3Index, 2)}` : ''} — ${irrigLabel} ile kritik nem yönetimi.`,
+          title: 'Flowering & Water Stress Shield',
+          desc: `June NASA forecast: ${jun ? `${num(jun.temperatureC)} °C, WET3: ${num(jun.soilWetnessWet3Index, 2)}` : ''} — critical moisture management with ${irrigLabel}.`,
           color: 'bg-amber-500'
         },
         {
           m: months[6],
-          title: 'Dane / Tabla Dolumu',
-          desc: `Temmuz NASA tahmini: ${jul ? `${num(jul.temperatureC)} °C, yağış ${num(jul.precipitationMm)} mm` : ''} — sıcak dalgasına karşı erken olgunlaşma avantajı.`,
+          title: 'Grain / Head Filling',
+          desc: `July NASA forecast: ${jul ? `${num(jul.temperatureC)} °C, rain ${num(jul.precipitationMm)} mm` : ''} — early maturation advantage against heatwaves.`,
           color: 'bg-sky-600'
         },
         {
           m: `${months[7]} – ${months[8]}`,
-          title: 'Hasat & Verim Koruma',
-          desc: `${strategy.yieldDeltaText} hedefiyle güvenli hasat ve nem kontrolü (${num(sim.payload?.soil?.areaDekar)} da).`,
+          title: 'Harvest & Yield Protection',
+          desc: `Safe harvest and grain moisture check targeting ${strategy.yieldDeltaText} (${num(sim.payload?.soil?.areaDekar)} da).`,
           color: 'bg-amber-600'
         },
         {
           m: `${months[9]} – ${months[10]}`,
-          title: 'Rotasyon Döngüsü & Anız Yönetimi',
-          desc: `${strategy.title} nöbeti sonrası toprak organik madde kazanımı ve yeni sezon hazırlığı.`,
+          title: 'Rotation Cycle & Residue Management',
+          desc: `Soil organic matter recovery and next-season preparation following ${strategy.title} rotation.`,
           color: 'bg-emerald-600'
         }
       ]
     : [
         {
           m: months[8],
-          title: 'Toprak Hazırlığı & Tav Kontrolü',
+          title: 'Soil Preparation & Moisture Check',
           desc: soilPrepNote,
           color: 'bg-sky-500'
         },
         {
           m: windowLabel,
-          title: 'Dinamik Optimum Ekim Penceresi',
-          desc: `${strategy.sequence[1] || strategy.sequence[0]} ekimi (${irrigLabel} · Su tasarruf hedefi: %${num(strategy.waterSaving)}).`,
+          title: 'Dynamic Optimal Planting Window',
+          desc: `${strategy.sequence[1] || strategy.sequence[0]} sowing (${irrigLabel} · Water saving target: ${num(strategy.waterSaving)}%).`,
           color: 'bg-emerald-500'
         },
         {
           m: `${months[10]} – ${months[0]}`,
-          title: 'Çimlenme & Kardeşlenme',
-          desc: `Kasım NASA tahmini: ${nov ? `${num(nov.temperatureC)} °C, yağış ${num(nov.precipitationMm)} mm, WET3: ${num(nov.soilWetnessWet3Index, 2)}` : 'kış öncesi kök gelişimi'}.`,
+          title: 'Germination & Tillering',
+          desc: `November NASA forecast: ${nov ? `${num(nov.temperatureC)} °C, rain ${num(nov.precipitationMm)} mm, WET3: ${num(nov.soilWetnessWet3Index, 2)}` : 'pre-winter root establishment'}.`,
           color: 'bg-emerald-400'
         },
         {
           m: months[2],
-          title: 'Sapa Kalkma & İlkbahar Beslemesi',
-          desc: `Mart NASA tahmini: ${mar ? `${num(mar.temperatureC)} °C, yağış ${num(mar.precipitationMm)} mm, WET3: ${num(mar.soilWetnessWet3Index, 2)}` : ''} — ${soilLabel} için azotlu üst gübreleme.`,
+          title: 'Stem Elongation & Spring Nutrition',
+          desc: `March NASA forecast: ${mar ? `${num(mar.temperatureC)} °C, rain ${num(mar.precipitationMm)} mm, WET3: ${num(mar.soilWetnessWet3Index, 2)}` : ''} — nitrogen top-dressing for ${soilLabel}.`,
           color: 'bg-sky-500'
         },
         {
           m: months[3],
-          title: 'Hastalık & Pas Kalkanı',
-          desc: `Nisan NASA tahmini: ${apr ? `${num(apr.temperatureC)} °C, yağış ${num(apr.precipitationMm)} mm` : ''} — bahar neminde yaprak mantarı kontrolü.`,
+          title: 'Disease & Rust Shield',
+          desc: `April NASA forecast: ${apr ? `${num(apr.temperatureC)} °C, rain ${num(apr.precipitationMm)} mm` : ''} — foliar fungal inspection under spring humidity.`,
           color: 'bg-amber-500'
         },
         {
           m: months[4],
-          title: 'Başaklanma / Çiçeklenme & Dane Dolumu',
-          desc: `Mayıs NASA tahmini: ${may ? `${num(may.temperatureC)} °C, yağış ${num(may.precipitationMm)} mm, WET3: ${num(may.soilWetnessWet3Index, 2)}` : ''} — ${irrigLabel} ile su stresi yönetimi.`,
+          title: 'Heading / Flowering & Grain Filling',
+          desc: `May NASA forecast: ${may ? `${num(may.temperatureC)} °C, rain ${num(may.precipitationMm)} mm, WET3: ${num(may.soilWetnessWet3Index, 2)}` : ''} — water stress management with ${irrigLabel}.`,
           color: 'bg-sky-600'
         },
         {
           m: `${months[5]} – ${months[6]}`,
-          title: 'Erken Hasat & Depolama',
-          desc: `Haziran–Temmuz (${jun ? `${num(jun.temperatureC)}–${num(jul?.temperatureC)} °C` : ''}) aşırı sıcakları öncesi ${strategy.yieldDeltaText} ile hasat.`,
+          title: 'Early Harvest & Storage',
+          desc: `Harvest with ${strategy.yieldDeltaText} prior to June–July (${jun ? `${num(jun.temperatureC)}–${num(jul?.temperatureC)} °C` : ''}) extreme heat.`,
           color: 'bg-amber-600'
         },
         {
           m: `${months[7]} – ${months[8]}`,
-          title: 'Rotasyon Geçişi (2. Ürün Hazırlığı)',
-          desc: `${strategy.title} rotasyonu ile toprakta azot/nem dengesinin korunması.`,
+          title: 'Rotation Transition (2nd Crop Prep)',
+          desc: `Preserving soil nitrogen and moisture balance through ${strategy.title} rotation.`,
           color: 'bg-emerald-600'
         }
       ];
@@ -162,8 +162,8 @@ export function renderPlantingTimeline(sim, selectedStrategyId) {
   box.innerHTML = `
     <div class="flex flex-wrap items-center justify-between gap-2 border-b border-sky-100 pb-3">
       <div>
-        <h3 class="text-base font-bold text-slate-900">📅 Rotasyon Sırası & 12 Aylık Fenolojik Ekim Takvimi</h3>
-        <p class="text-xs text-slate-500">Seçili strateji, NASA aylık tahminleri ve <strong>${esc(soilLabel)}</strong> yapısına göre: <strong>${esc(strategy.title)}</strong></p>
+        <h3 class="text-base font-bold text-slate-900">📅 Rotation Sequence & 12-Month Phenological Planting Calendar</h3>
+        <p class="text-xs text-slate-500">Tailored to selected strategy, NASA monthly forecasts, and <strong>${esc(soilLabel)}</strong> structure: <strong>${esc(strategy.title)}</strong></p>
       </div>
       <span class="text-xs font-mono font-semibold px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800">
         🌱 ${esc(windowLabel)}
@@ -173,7 +173,7 @@ export function renderPlantingTimeline(sim, selectedStrategyId) {
     <div class="flex flex-wrap items-center gap-3">
       ${strategy.sequence.map((name, index) => `
         <div class="rounded-xl border border-emerald-200 bg-emerald-50/80 px-4 py-2.5">
-          <span class="text-[11px] font-mono text-emerald-700 font-semibold">${index + 1}. Sezon Ürünü</span>
+          <span class="text-[11px] font-mono text-emerald-700 font-semibold">Season ${index + 1} Crop</span>
           <p class="text-sm font-bold text-slate-900">${esc(name)}</p>
         </div>
       `).join('<span aria-hidden="true" class="text-emerald-600 font-bold text-lg">→</span>')}

@@ -43,7 +43,7 @@ def optional_number(obj, field, label, low=None, high=None):
     return None if value is None else finite(value,label,low,high)
 
 def band(value):
-    return 'dusuk' if value < 30 else ('orta' if value < 60 else 'yuksek')
+    return 'low' if value < 30 else ('medium' if value < 60 else 'high')
 
 def optional(row, field, nd=3):
     v = row.get(field)
@@ -155,7 +155,7 @@ def assess(payload:dict[str,Any]):
         a,b=(crops[x] for x in seq)
         same_family = a['family']==b['family']
         legume_break = a['family']=='cereal' and b['family']=='legume'
-        benefit = 'Baklagil rotasyonu, uygun kosullarda azot dongusune katki saglayabilir' if legume_break else ('Bitki ailesi cesitliligi saglar' if not same_family else 'Ayni ailenin tekrari; hastalik/zararli dongusu incelenmeli')
+        benefit = 'Legume rotation can contribute to nitrogen cycling under suitable conditions' if legume_break else ('Provides plant family diversity' if not same_family else 'Repetition of the same plant family; disease/pest cycle should be inspected')
         et_min=b['water_need_min_mm']
         exceeds = max_et is not None and et_min is not None and et_min>max_et
         unknown_water = et_min is None
@@ -168,11 +168,11 @@ def assess(payload:dict[str,Any]):
         if unknown_water: suitability-=0  # unknown is not unsuitable
         suitability = int(round(min(100,max(0,suitability))))
         concerns=[]
-        if same_family: concerns.append('Ayni bitki ailesinde tekrar: hastalik ve besin dengesi kontrolu')
-        if exceeds: concerns.append('Sezonluk FAO ET alt siniri, kullanici tarafindan verilen ET rehber limitinden yuksek')
-        if unknown_water: concerns.append('Urun-ozel guvenilir sezonluk ET araligi yok; su uygunlugu bilinmiyor')
-        if irrigated is False: concerns.append('Sulama bulunmadigi bildirildi; su dengesi yerel olarak incelenmeli')
-        concerns.extend(['Ekim takvimi, pH, toprak teksturu, drenaj, zararli gecmisi ve pazar bilgisi dogrulanmali','Aylik yagis miktari ile mevsimsel ET dogrudan karsilastirilmadi'])
+        if same_family: concerns.append('Repetition within the same plant family: check disease and nutrient balance')
+        if exceeds: concerns.append('Seasonal FAO ET lower bound exceeds user-supplied ET guide limit')
+        if unknown_water: concerns.append('No reliable crop-specific seasonal ET range; water suitability unknown')
+        if irrigated is False: concerns.append('No irrigation reported; water balance must be inspected locally')
+        concerns.extend(['Planting schedule, pH, soil texture, drainage, pest history, and market info must be verified','Monthly rainfall and seasonal ET are not directly compared'])
         results.append({
             'id':'current' if idx==0 else f'alternative_{idx}',
             'type':'current' if idx==0 else 'alternative',
@@ -184,7 +184,7 @@ def assess(payload:dict[str,Any]):
                              'etLimitExceeded':bool(exceeds) if max_et is not None and et_min is not None else None,
                              'isIrrigationDemandEstimate':False},
             'risksAndLocalChecks':concerns,
-            'evidenceLimitations':['Puanlar secilmis sezgisel agirliklarla uretilmistir; verim/tarimsal uygunluk modeline karsi kalibre edilmedi'],
+            'evidenceLimitations':['Scores are generated with heuristic weights; not calibrated against a yield/agronomic suitability model'],
             'yieldPrediction':None, 'successProbability':None
         })
     # Scores are only within the same scenario. A change is not a real-world predicted effect.
@@ -221,15 +221,15 @@ def assess(payload:dict[str,Any]):
         'rotationStrategies':results,
         'modelType':'explainable_heuristic_no_trained_ml',
         'inputHandling':{'climateSummary':'reserved_not_used_in_scoring','forecast':'month selects supplied GEOS context; forecast values are explanatory and not used in rotation scoring','farmerInputs':'currentRotation, availableCrops, irrigationAvailable, maxSeasonalCropWaterNeedMm','scenario':'rainfallChangePct, temperatureChangeC, irrigationAvailabilityChangePct'},
-        'limitations':['Sayisal indeksler kalibre edilmis kuraklik olasiligi veya urun basarisi degildir',
-                       'Tahminler tek ensemble uyesidir; ensemble ortalamasi veya guven araligi hesaplanmadi. CSV uye bilgisi disaktarma koduna dayanir',
-                       'GEOS T2M ve WET3 ayri baslangic tarihlerinden geliyor',
-                       'GEOS WET3 ile POWER GWETROOT dogrudan karsilastirilmaz',
-                       'Eksik yagis/toprak nemi tahminleri null; tarihsel ortalamalar tahmin yerine kullanilmaz',
-                       'Aylik referans ortalamalari POWER 2006-2025 verilerinden hesaplandi; tarihsel 2025 stres indeksi eski 2006-2024 referansini korur',
-                       'GEOS-S2S ve POWER farklari yanlilik duzeltmesi yapilmamis kaynaklar arasi karsilastirmadir; kalibre anomali veya kesin risk degildir',
-                       'En yakin grid tarla olceginde bir gozlem degildir',
-                       'Toprak, sulama ve yerel tarim uzmani dogrulamasi zorunludur'],
+        'limitations':['Numerical indices are not calibrated drought probabilities or crop success rates',
+                       'Forecasts are from a single ensemble member; ensemble mean or confidence interval is not calculated. CSV member info relies on export code',
+                       'GEOS T2M and WET3 come from separate initialization dates',
+                       'GEOS WET3 and POWER GWETROOT are not directly compared',
+                       'Missing rainfall/soil moisture forecasts are null; historical averages are not substituted as forecasts',
+                       'Monthly reference averages are calculated from POWER 2006-2025 data; historical 2025 stress index retains the 2006-2024 baseline',
+                       'GEOS-S2S and POWER differences are uncalibrated cross-product comparisons, not calibrated anomalies or definitive risks',
+                       'Nearest grid point is not a field-scale observation',
+                       'Soil, irrigation, and local agronomist validation is mandatory'],
         'sources':['https://www.fao.org/4/s2022e/s2022e07.htm', 'https://www.fao.org/4/Y5146E/y5146e0a.htm']
     }
     return result

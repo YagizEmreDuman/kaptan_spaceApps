@@ -98,7 +98,7 @@ test('malformed algorithm response and empty catalogue are rejected', async () =
   assert.equal(result.status, 'error');
   assert.deepEqual(result.data.strategies, []);
   globalThis.fetch = async () => json({ crops: [], forecastMonths: [] });
-  await assert.rejects(fetchCatalog(), /boş/);
+  await assert.rejects(fetchCatalog(), /empty/);
 });
 
 test('daily dates and null fields never generate extra days or defaults', () => {
@@ -116,10 +116,10 @@ test('UI renders actual strategy names without invented income or planting dates
   const nodes = fakeDocument();
   renderDashboardUI(buildDashboardData(payload, prediction, weather, metadata));
   const all = [...nodes.values()].map(node => node.innerHTML + node.textContent).join(' ');
-  assert.match(all, /Buğday/);
+  assert.match(all, /Buğday|Wheat/);
   assert.match(all, /POWER/);
   assert.doesNotMatch(all, /NaN|undefined|Net Kazanç|₺|26 Eylül|30 Günlük/);
-  assert.match(nodes.get('planting-timeline-box').innerHTML, /tarihi üretmiyor/);
+  assert.match(nodes.get('planting-timeline-box').innerHTML, /does not generate/);
   assert.match(nodes.get('farmer-task-calendar-box').innerHTML, /2030/);
   assert.ok(nodes.get('farmer-task-calendar-box').innerHTML.includes('—'));
 });
@@ -127,8 +127,8 @@ test('UI renders actual strategy names without invented income or planting dates
 test('error view clears old cards and weather', () => {
   const nodes = fakeDocument();
   renderDashboardUI(buildDashboardData(payload, null, null, metadata));
-  assert.match(nodes.get('rotation-cards-grid').innerHTML, /bağlantı gerekiyor/);
-  assert.match(nodes.get('farmer-task-calendar-box').innerHTML, /Günlük hava verisi alınamadı/);
+  assert.match(nodes.get('rotation-cards-grid').innerHTML, /connection to the algorithm service is required/i);
+  assert.match(nodes.get('farmer-task-calendar-box').innerHTML, /Daily weather data unavailable/);
   assert.doesNotMatch([...nodes.values()].map(node => node.innerHTML).join(''), /2030|4\.344|NaN|undefined/);
 });
 

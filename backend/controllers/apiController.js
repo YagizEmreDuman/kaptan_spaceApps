@@ -1,4 +1,4 @@
-﻿const algorithmService = require('../services/algorithmService');
+const algorithmService = require('../services/algorithmService');
 const weatherService = require('../services/weatherService');
 
 function coordinates(body) {
@@ -7,7 +7,7 @@ function coordinates(body) {
     if (typeof lat !== 'number' || typeof lon !== 'number' ||
         !Number.isFinite(lat) || !Number.isFinite(lon) ||
         Math.abs(lat) > 90 || Math.abs(lon) > 180) {
-        throw new Error('Geçerli enlem ve boylam gereklidir.');
+        throw new Error('Valid latitude and longitude are required.');
     }
     return { latitude: lat, longitude: lon };
 }
@@ -23,7 +23,7 @@ exports.getCatalog = async (_req, res) => {
     try {
         res.json(await algorithmService.catalog());
     } catch (error) {
-        serviceError(res, error, 'Algorithm servisine ulaşılamadı. Ürün kataloğu yüklenemedi.');
+        serviceError(res, error, 'Could not reach algorithm service. Crop catalog could not be loaded.');
     }
 };
 
@@ -37,7 +37,7 @@ exports.getLocationAnalysis = async (req, res) => {
             monthlyForecasts: result.monthlyForecasts, historicalClimate: result.historicalClimate,
             rawDailyData: null });
     } catch (error) {
-        serviceError(res, error, 'Algorithm iklim verileri alınamadı.');
+        serviceError(res, error, 'Could not retrieve algorithm climate data.');
     }
 };
 
@@ -55,7 +55,7 @@ exports.runSimulationAndRotation = async (req, res) => {
         });
         res.json({ success: true, simulationResult: result, upcomingTasks: [] });
     } catch (error) {
-        serviceError(res, error, 'Algorithm servisine ulaşılamadı. Tahmin ve rotasyon sonuçları alınamadı.');
+        serviceError(res, error, 'Could not reach algorithm service. Forecast and rotation results unavailable.');
     }
 };
 
@@ -69,6 +69,6 @@ exports.getWeatherAndTasks = async (req, res) => {
             timezone: data.timezone, forecast14Days: data.forecast14Days,
             taskCalendar: data.farmerTaskCalendar });
     } catch (error) {
-        serviceError(res, error, 'Günlük hava servisi veri döndürmedi. Örnek hava tahmini kullanılmadı.');
+        serviceError(res, error, 'Daily weather service returned no data. No sample weather forecast was used.');
     }
 };

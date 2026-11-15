@@ -1,4 +1,4 @@
-﻿const axios = require('axios');
+const axios = require('axios');
 const NodeCache = require('node-cache');
 const weatherCache = new NodeCache({ stdTTL: 1800 });
 const finite = value => typeof value === 'number' && Number.isFinite(value) ? value : null;
@@ -16,7 +16,7 @@ async function getForecastAndTasks(lat, lng) {
     });
     const daily = response.data.daily;
     if (!Array.isArray(daily?.time) || daily.time.length === 0) {
-        throw new Error('Günlük hava verisi bulunamadı.');
+        throw new Error('Daily weather data not found.');
     }
     const forecastList = daily.time.map((date, i) => ({
         date,
@@ -32,12 +32,12 @@ async function getForecastAndTasks(lat, lng) {
     const tasks = [];
     for (const day of forecastList) {
         if (day.minTemp !== null && day.minTemp <= 0) tasks.push({
-            date: day.date, type: 'UYARI', task: 'Düşük sıcaklık için saha kontrolü',
-            reason: `Tahmini en düşük sıcaklık ${day.minTemp} °C.`
+            date: day.date, type: 'WARNING', task: 'Field inspection for low temperature',
+            reason: `Forecast minimum temperature ${day.minTemp} °C.`
         });
         if (day.rainMm !== null && day.rainMm > 5) tasks.push({
-            date: day.date, type: 'BİLGİ', task: 'Yağış öncesi saha planını kontrol edin',
-            reason: `Tahmini günlük toplam yağış ${day.rainMm} mm.`
+            date: day.date, type: 'INFO', task: 'Review field schedule before rainfall',
+            reason: `Forecast daily total precipitation ${day.rainMm} mm.`
         });
     }
     const result = { forecast14Days: forecastList, farmerTaskCalendar: tasks,

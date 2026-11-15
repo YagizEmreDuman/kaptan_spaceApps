@@ -37,31 +37,31 @@ export function renderSimulationPanel(basePayload, onSimulate, metadata) {
     }, 250);
   }
   const sliders = [
-    { key: 'rainDeltaPct', label: 'Yağış değişimi (%)', min: -100, max: 100, step: 5 },
-    { key: 'temperatureChangeC', label: 'Sıcaklık değişimi (°C)', min: -10, max: 15, step: .5 },
-    { key: 'irrigationAvailabilityChangePct', label: 'Sulama erişimi değişimi (%)', min: -100, max: 100, step: 5 }
+    { key: 'rainDeltaPct', label: 'Precipitation change (%)', min: -100, max: 100, step: 5 },
+    { key: 'temperatureChangeC', label: 'Temperature change (°C)', min: -10, max: 15, step: .5 },
+    { key: 'irrigationAvailabilityChangePct', label: 'Irrigation access change (%)', min: -100, max: 100, step: 5 }
   ];
   function render() {
-    box.innerHTML = `<div class="flex justify-between gap-3"><div><h3 class="text-sm font-bold">Canlı Senaryo & Parametre Simülasyonu</h3>
-      <p class="text-xs text-slate-500 mt-1">Seçtiğiniz ürün, toprak tipi, sulama yöntemi ve iklim senaryosu değişiklikleri karar motorunda anında yeniden hesaplanır.</p></div>
-      <button id="sim-reset-btn" type="button" class="text-xs underline shrink-0">Sıfırla</button></div>
+    box.innerHTML = `<div class="flex justify-between gap-3"><div><h3 class="text-sm font-bold">Live Scenario & Parameter Simulation</h3>
+      <p class="text-xs text-slate-500 mt-1">Changes to your selected crop, soil type, irrigation method, and climate scenario are recalculated instantaneously in the decision engine.</p></div>
+      <button id="sim-reset-btn" type="button" class="text-xs underline shrink-0">Reset</button></div>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">${sliders.map(slider => `
         <label class="text-xs">${esc(slider.label)} <output id="sim-${slider.key}-value" class="font-mono font-bold">${state[slider.key]}</output>
         <input id="sim-${slider.key}" data-sim-slider="${slider.key}" class="w-full mt-3 accent-emerald-600" type="range"
           min="${slider.min}" max="${slider.max}" step="${slider.step}" value="${state[slider.key]}"></label>`).join('')}</div>
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4 text-xs">
-        <label>Ürün<select id="sim-crop-select" class="w-full border rounded-lg p-2 mt-1">${metadata.crops.map(crop =>
+        <label>Crop<select id="sim-crop-select" class="w-full border rounded-lg p-2 mt-1">${metadata.crops.map(crop =>
           `<option value="${esc(crop.id)}" ${crop.id === state.crop ? 'selected' : ''}>${esc(crop.name)}</option>`).join('')}</select></label>
-        <label>Toprak Tipi<select id="sim-soil-select" class="w-full border rounded-lg p-2 mt-1">${[
-          ['tinli', 'Tınlı Toprak'], ['killi', 'Killi Toprak'], ['kumlu', 'Kumlu Toprak'], ['kirecli', 'Kireçli Toprak']
+        <label>Soil Type<select id="sim-soil-select" class="w-full border rounded-lg p-2 mt-1">${[
+          ['tinli', 'Loamy Soil'], ['killi', 'Clay Soil'], ['kumlu', 'Sandy Soil'], ['kirecli', 'Calcareous Soil']
         ].map(([value, label]) => `<option value="${value}" ${value === state.soilType ? 'selected' : ''}>${label}</option>`).join('')}</select></label>
-        <label>Tahmin Ayı<select id="sim-month-select" class="w-full border rounded-lg p-2 mt-1">${metadata.forecastMonths.map(month =>
+        <label>Forecast Month<select id="sim-month-select" class="w-full border rounded-lg p-2 mt-1">${metadata.forecastMonths.map(month =>
           `<option value="${esc(month)}" ${month === state.month ? 'selected' : ''}>${esc(formatMonth(month))}</option>`).join('')}</select></label>
-        <label>Sulama Yöntemi<select id="sim-irrigation-select" class="w-full border rounded-lg p-2 mt-1">${[
-          ['damla_sulama', 'Damla sulama'], ['yagmurlama', 'Yağmurlama'], ['salma_sulama', 'Salma sulama'], ['kuru_tarim', 'Kuru tarım']
+        <label>Irrigation Method<select id="sim-irrigation-select" class="w-full border rounded-lg p-2 mt-1">${[
+          ['damla_sulama', 'Drip irrigation'], ['yagmurlama', 'Sprinkler irrigation'], ['salma_sulama', 'Flood irrigation'], ['kuru_tarim', 'Dry farming (Rainfed)']
         ].map(([value, label]) => `<option value="${value}" ${value === state.irrigation ? 'selected' : ''}>${label}</option>`).join('')}</select></label>
       </div>
-      <p class="text-[11px] text-slate-500 mt-3">Tüm rotasyon kartları, ekim pencereleri, su tasarrufu ve net kazanç projeksiyonları yukarıdaki parametrelere göre canlı güncellenir.</p>`;
+      <p class="text-[11px] text-slate-500 mt-3">All rotation cards, planting windows, water savings, and net profit projections update live according to the parameters above.</p>`;
     box.querySelectorAll('[data-sim-slider]').forEach(input => input.addEventListener('input', () => {
       state[input.dataset.simSlider] = Number(input.value);
       document.getElementById(`sim-${input.dataset.simSlider}-value`).textContent = input.value;

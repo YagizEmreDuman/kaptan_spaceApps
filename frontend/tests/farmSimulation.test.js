@@ -91,7 +91,7 @@ test('API failure or insufficient indicators never produce substitute model valu
   globalThis.fetch = async () => new Response(JSON.stringify({ error: 'algorithm offline' }), { status: 503 });
   await assert.rejects(requestFarmPrediction({}, undefined), /offline/);
   globalThis.fetch = async () => new Response(JSON.stringify({ simulationResult: { forecast: {} } }), { status: 200 });
-  await assert.rejects(requestFarmPrediction({}, undefined), /göstergelerini/);
+  await assert.rejects(requestFarmPrediction({}, undefined), /indicators/);
 });
 
 test('separate component context is stable during parent scenario rerenders', () => {

@@ -48,36 +48,36 @@ class FarmSimulation {
   name(id) { return this.catalog.find(crop => crop.id === id)?.name || id; }
   render() {
     const options = selected => this.catalog.map(crop => `<option value="${esc(crop.id)}" ${crop.id === selected ? 'selected' : ''}>${esc(crop.name)}</option>`).join('');
-    this.root.innerHTML = `<div class="farm-heading"><div><span class="farm-eyebrow">SANAL TARLA</span><h3>Tarım Simülasyonu</h3>
-      <p>İki ürünü aynı koşullarda deneyin. Bu alandaki seçimler formunuzu veya NASA kayıtlarını değiştirmez.</p></div><span class="farm-label">Temsili animasyon</span></div>
+    this.root.innerHTML = `<div class="farm-heading"><div><span class="farm-eyebrow">VIRTUAL FIELD</span><h3>Farm Simulation</h3>
+      <p>Test two crops under identical conditions. Selections here do not alter your main form or NASA records.</p></div><span class="farm-label">Illustrative animation</span></div>
       <div class="farm-layout"><div class="farm-playground">
-        <canvas id="farm-field" role="img" aria-label="Seçilen ürünün temsili gelişim animasyonu"></canvas>
+        <canvas id="farm-field" role="img" aria-label="Illustrative growth animation of the selected crop"></canvas>
         <div class="farm-stage-heading"><strong id="farm-stage"></strong><span id="farm-elapsed"></span></div>
         <ol class="farm-stages">${STAGES.map((label, index) => `<li data-farm-stage="${index}">${index + 1}. ${esc(label)}</li>`).join('')}</ol>
-        <div class="farm-playback"><button id="farm-start" type="button">▶ Başlat</button><button id="farm-pause" type="button">Ⅱ Duraklat</button>
-          <button id="farm-reset" type="button">↺ Sıfırla</button><label>Hız <select id="farm-speed" aria-label="Animasyon hızı"><option value="1">1×</option><option value="2">2×</option><option value="4">4×</option></select></label>
+        <div class="farm-playback"><button id="farm-start" type="button">▶ Start</button><button id="farm-pause" type="button">Ⅱ Pause</button>
+          <button id="farm-reset" type="button">↺ Reset</button><label>Speed <select id="farm-speed" aria-label="Animation speed"><option value="1">1×</option><option value="2">2×</option><option value="4">4×</option></select></label>
           <span id="farm-clock-status" role="status"></span></div>
-        <p class="farm-note">Süre, sanal animasyon saniyesidir. Aşamalar ve büyüme hızı gerçek fenoloji veya hasat tarihi tahmini değildir.</p>
+        <p class="farm-note">Duration is virtual animation seconds. Stages and growth speed are not actual phenology or harvest date predictions.</p>
       </div><div class="farm-controls">
-        <label>Senaryo A · mevcut ürün<select id="farm-crop-a">${options(this.crops[0])}</select></label>
-        <label>Senaryo B · alternatif ürün<select id="farm-crop-b">${options(this.crops[1])}</select></label>
+        <label>Scenario A · current crop<select id="farm-crop-a">${options(this.crops[0])}</select></label>
+        <label>Scenario B · alternative crop<select id="farm-crop-b">${options(this.crops[1])}</select></label>
         ${[
-          ['rainfallChangePct', 'Yağış değişimi', '%', -100, 100, 5],
-          ['temperatureChangeC', 'Sıcaklık değişimi', '°C', -10, 15, .5],
-          ['irrigationAvailabilityChangePct', 'Sulama erişimi değişimi', '%', -100, 100, 5]
+          ['rainfallChangePct', 'Precipitation change', '%', -100, 100, 5],
+          ['temperatureChangeC', 'Temperature change', '°C', -10, 15, .5],
+          ['irrigationAvailabilityChangePct', 'Irrigation access change', '%', -100, 100, 5]
         ].map(([key, label, unit, min, max, step]) => `<label>${label}<output id="farm-value-${key}">0 ${unit}</output>
           <input id="farm-${key}" data-farm-condition="${key}" data-unit="${unit}" type="range" min="${min}" max="${max}" step="${step}" value="0"></label>`).join('')}
-        <p class="farm-note">Sulama kontrolü mevcut motorun göreli erişim girdisidir; litre veya mm sulama miktarı hesaplanmaz.</p>
+        <p class="farm-note">Irrigation control is a relative access input to the engine; liters or mm of irrigation volume are not calculated.</p>
         <div id="farm-api-status" role="status" aria-live="polite"></div>
       </div></div>
-      <div class="farm-comparison" id="farm-comparison" aria-label="Aynı koşullarda ürün karşılaştırması"></div>
-      <div class="farm-evidence"><section><h4>NASA başlangıç koşulları</h4><div id="farm-baseline"></div></section>
-        <section><h4>Senaryo katmanı · seçili ürün</h4><div id="farm-scenario"></div></section></div>
+      <div class="farm-comparison" id="farm-comparison" aria-label="Crop comparison under identical conditions"></div>
+      <div class="farm-evidence"><section><h4>NASA baseline conditions</h4><div id="farm-baseline"></div></section>
+        <section><h4>Scenario layer · selected crop</h4><div id="farm-scenario"></div></section></div>
       <p class="farm-visual-explanation" id="farm-visual-explanation"></p>
-      <details class="farm-limitations"><summary>Model ve görsel sınırları</summary>
-        <p>Motor genel bir varsayımsal senaryo baskısı ve sezgisel uygunluk indeksi üretir. Ayrı su stresi, sıcaklık stresi, biyolojik büyüme hızı, kesin hasat miktarı veya ölüm olasılığı üretmez.</p>
-        <p>Renk ve eğim genel baskı indeksinin temsilidir; sağlıklı büyüme, yavaşlama, solma veya kuruma teşhisi değildir. Yağış ve sulama efektleri kullanıcı varsayımlarını gösterir. Ürünler aynı baskı indeksini alabilir; bu biyolojik eşdeğerlik anlamına gelmez.</p>
-        <p>Eksik NASA yağış tahmini geçmiş ortalamayla tamamlanmaz. Tüm büyüme aşamaları görsel anlatım içindir.</p>
+      <details class="farm-limitations"><summary>Model and visual limitations</summary>
+        <p>The engine produces a general hypothetical scenario pressure and heuristic suitability index. It does not produce separate water stress, heat stress, biological growth rate, exact harvest volume, or mortality probability.</p>
+        <p>Color and tilt represent the overall pressure index; they are not diagnoses of healthy growth, slowdown, wilting, or desiccation. Rainfall and irrigation effects show user assumptions. Crops may receive the same pressure index; this does not imply biological equivalence.</p>
+        <p>Missing NASA precipitation forecasts are not filled with historical averages. All growth stages are for visual illustration.</p>
       </details>`;
     this.get('crop-a').addEventListener('change', event => this.changeCrop(0, event.target.value));
     this.get('crop-b').addEventListener('change', event => this.changeCrop(1, event.target.value));
@@ -101,7 +101,7 @@ class FarmSimulation {
     const revision = ++this.revision;
     this.results = [null, null]; this.errors = [];
     this.root.dataset.evaluationState = 'pending';
-    this.get('api-status').textContent = 'İki senaryo karar motorunda değerlendiriliyor…';
+    this.get('api-status').textContent = 'Evaluating both scenarios in the decision engine…';
     this.updateEvidence();
     this.debounce = setTimeout(async () => {
       const controller = new AbortController(); this.controller = controller;
@@ -111,11 +111,11 @@ class FarmSimulation {
       if (revision !== this.revision) return;
       clearTimeout(this.timeout);
       this.results = responses.map(response => response.status === 'fulfilled' ? response.value : null);
-      this.errors = responses.map(response => response.status === 'rejected' ? response.reason?.message || 'Yanıt alınamadı' : null);
+      this.errors = responses.map(response => response.status === 'rejected' ? response.reason?.message || 'No response received' : null);
       const count = this.results.filter(Boolean).length;
       this.root.dataset.evaluationState = count === 2 ? 'ready' : count ? 'partial' : 'error';
-      this.get('api-status').textContent = count === 2 ? 'A ve B aynı iklim ve sulama girdileriyle değerlendirildi.'
-        : 'Model yanıtı eksik. Animasyon bu durumda yalnızca ürün ve aşama görselidir; örnek model sonucu kullanılmaz.';
+      this.get('api-status').textContent = count === 2 ? 'A and B were evaluated with identical climate and irrigation inputs.'
+        : 'Model response incomplete. Animation shows only crop and stage visuals; no sample model output is used.';
       this.updateEvidence(); this.paint();
     }, wait);
   }
@@ -125,40 +125,40 @@ class FarmSimulation {
     const history = this.results[this.active]?.historicalClimate || this.baseline?.historicalClimate;
     const definition = (label, value) => `<div><dt>${esc(label)}</dt><dd>${esc(value)}</dd></div>`;
     this.get('baseline').innerHTML = `<dl>${[
-      ['Geçerli ay', formatMonth(baseline?.validMonth)],
-      ['Sıcaklık tahmini', `${num(baseline?.temperatureC)} °C`],
-      ['Yağış tahmini', baseline?.monthlyPrecipitationMm == null ? 'Tahmin yok' : `${num(baseline.monthlyPrecipitationMm)} mm`],
-      ['WET3 toprak nemi', num(baseline?.soilWetnessWet3Index, 4)],
-      ['Geçmiş yağış · ayrı referans', `${num(history?.monthlyMeanPrecipitationMm)} mm (${history?.referencePeriod || '—'})`]
+      ['Valid month', formatMonth(baseline?.validMonth)],
+      ['Temperature forecast', `${num(baseline?.temperatureC)} °C`],
+      ['Precipitation forecast', baseline?.monthlyPrecipitationMm == null ? 'No forecast' : `${num(baseline.monthlyPrecipitationMm)} mm`],
+      ['WET3 soil moisture', num(baseline?.soilWetnessWet3Index, 4)],
+      ['Historical precipitation · separate baseline', `${num(history?.monthlyMeanPrecipitationMm)} mm (${history?.referencePeriod || '—'})`]
     ].map(([label, value]) => definition(label, value)).join('')}</dl>`;
     this.get('scenario').innerHTML = `<dl>${[
-      ['Görseldeki ürün', this.name(this.crops[this.active])],
-      ['Yağış değişimi', `${this.conditions.rainfallChangePct}%`],
-      ['Sıcaklık değişimi', `${this.conditions.temperatureChangeC} °C`],
-      ['Sulama erişimi değişimi', `${this.conditions.irrigationAvailabilityChangePct}%`],
-      ['Formdaki sulama', this.payload.cropAndResources.irrigation === 'kuru_tarim' ? 'Sulama yok' : 'Sulama var'],
-      ['Motorun senaryo sıcaklığı', `${num(view.scenarioTemperature)} °C`],
-      ['Motorun senaryo yağışı', view.scenarioPrecipitation === null ? 'Hesaplanamadı; tahmin yok veya yanıt bekleniyor' : `${num(view.scenarioPrecipitation)} mm`]
+      ['Displayed crop', this.name(this.crops[this.active])],
+      ['Precipitation change', `${this.conditions.rainfallChangePct}%`],
+      ['Temperature change', `${this.conditions.temperatureChangeC} °C`],
+      ['Irrigation access change', `${this.conditions.irrigationAvailabilityChangePct}%`],
+      ['Form irrigation', this.payload.cropAndResources.irrigation === 'kuru_tarim' ? 'No irrigation' : 'Irrigated'],
+      ['Engine scenario temperature', `${num(view.scenarioTemperature)} °C`],
+      ['Engine scenario precipitation', view.scenarioPrecipitation === null ? 'Not calculated; no forecast or awaiting response' : `${num(view.scenarioPrecipitation)} mm`]
     ].map(([label, value]) => definition(label, value)).join('')}</dl>`;
     this.get('comparison').innerHTML = this.crops.map((crop, index) => {
       const result = modelView(this.results[index]);
       return `<button type="button" data-farm-view="${index}" aria-pressed="${this.active === index}">
-        <span>Senaryo ${index === 0 ? 'A' : 'B'}</span><strong>${esc(this.name(crop))}</strong>
-        <span>Genel senaryo baskısı: <b>${num(result.pressure)}/100</b></span>
-        <span>Sezgisel uygunluk: <b>${num(result.suitability)}/100</b></span>
-        <small>${this.errors[index] ? esc(this.errors[index]) : 'Kalibre risk veya verim olasılığı değildir.'}</small></button>`;
+        <span>Scenario ${index === 0 ? 'A' : 'B'}</span><strong>${esc(this.name(crop))}</strong>
+        <span>Overall scenario pressure: <b>${num(result.pressure)}/100</b></span>
+        <span>Heuristic suitability: <b>${num(result.suitability)}/100</b></span>
+        <small>${this.errors[index] ? esc(this.errors[index]) : 'Not a calibrated risk or yield probability.'}</small></button>`;
     }).join('');
     this.get('comparison').querySelectorAll('[data-farm-view]').forEach(button => button.addEventListener('click', () => {
       this.active = Number(button.dataset.farmView); this.updateEvidence(); this.paint();
     }));
     this.get('visual-explanation').textContent = view.pressure === null
-      ? 'Model sonucu bekleniyor veya alınamadı. Ürün silüeti ve sanal aşamalar gösteriliyor; bitki sağlığı sonucu üretilmiyor.'
-      : `Yaprak rengi ve eğimi motorun ${num(view.pressure)}/100 genel senaryo baskısını temsil eder. Bu bir su/sıcaklık stresi veya solma teşhisi değildir. İlerleme yalnızca animasyon zamanına bağlıdır.`;
+      ? 'Awaiting model result or unavailable. Crop silhouette and virtual stages are shown; no plant health output is generated.'
+      : `Leaf color and tilt represent the engine's ${num(view.pressure)}/100 overall scenario pressure. This is not a water/heat stress or wilting diagnosis. Progression depends solely on animation time.`;
   }
   updateClock() {
     this.get('stage').textContent = STAGES[this.clock.stage];
-    this.get('elapsed').textContent = `${num(this.clock.seconds)} sanal saniye`;
-    this.get('clock-status').textContent = this.clock.running ? 'Çalışıyor' : this.clock.progress === 1 ? 'Animasyon tamamlandı' : 'Duraklatıldı';
+    this.get('elapsed').textContent = `${num(this.clock.seconds)} virtual seconds`;
+    this.get('clock-status').textContent = this.clock.running ? 'Running' : this.clock.progress === 1 ? 'Animation complete' : 'Paused';
     this.get('start').disabled = this.clock.running || this.clock.progress === 1;
     this.get('pause').disabled = !this.clock.running;
     this.root.querySelectorAll('[data-farm-stage]').forEach(item => {
@@ -171,7 +171,7 @@ class FarmSimulation {
     if (!this.renderer) return;
     const crop = this.crops[this.active];
     this.get('field').dataset.cropId = crop;
-    this.get('field').setAttribute('aria-label', `${this.name(crop)} · ${STAGES[this.clock.stage]} · temsili animasyon`);
+    this.get('field').setAttribute('aria-label', `${this.name(crop)} · ${STAGES[this.clock.stage]} · illustrative animation`);
     this.renderer.draw({ crop, name: this.name(crop), progress: this.clock.progress,
       pressure: modelView(this.results[this.active]).pressure, conditions: this.conditions, seconds: this.clock.seconds });
   }

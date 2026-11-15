@@ -17,9 +17,9 @@ export function buildDashboardData(payload, prediction = null, weather = null, m
   const crop = metadata?.crops?.find(item => item.id === payload.cropAndResources.targetCrop);
   return {
     payload, prediction, metadata,
-    cropLabel: crop?.name || payload.cropAndResources.targetCrop || 'Ürün seçilmedi',
+    cropLabel: crop?.name || payload.cropAndResources.targetCrop || 'No crop selected',
     soilLabel: SOIL_LABELS[payload.soil.type] || payload.soil.type,
-    profile: { name: payload.location.label || 'Seçilen konum' },
+    profile: { name: payload.location.label || 'Selected Location' },
     monthlyForecasts,
     strategies: normalizeRotationStrategies(prediction?.rotationStrategies, payload, prediction),
     apiForecast14Days: Array.isArray(weather?.forecast14Days) ? weather.forecast14Days : [],

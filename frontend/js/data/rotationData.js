@@ -35,17 +35,17 @@ const PH_CROP_YIELD_FACTOR = {
 };
 
 const CROP_BASE_SOWING_DOY = {
-  wheat: { doy: 290, span: 12, isSpring: false },      // ~17 Ekim
-  barley: { doy: 293, span: 12, isSpring: false },     // ~20 Ekim
-  lentil: { doy: 286, span: 12, isSpring: false },     // ~13 Ekim
-  chickpea: { doy: 76, span: 12, isSpring: true },     // ~17 Mart
-  sunflower: { doy: 106, span: 12, isSpring: true },   // ~16 Nisan
-  maize: { doy: 116, span: 12, isSpring: true }        // ~26 Nisan
+  wheat: { doy: 290, span: 12, isSpring: false },      // ~Oct 17
+  barley: { doy: 293, span: 12, isSpring: false },     // ~Oct 20
+  lentil: { doy: 286, span: 12, isSpring: false },     // ~Oct 13
+  chickpea: { doy: 76, span: 12, isSpring: true },     // ~Mar 17
+  sunflower: { doy: 106, span: 12, isSpring: true },   // ~Apr 16
+  maize: { doy: 116, span: 12, isSpring: true }        // ~Apr 26
 };
 
-const TR_MONTH_NAMES = [
-  'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
-  'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
+const EN_MONTH_NAMES = [
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
 ];
 
 function formatDoyRange(startDoy, spanDays) {
@@ -53,13 +53,13 @@ function formatDoyRange(startDoy, spanDays) {
   const d1 = new Date(Date.UTC(baseYear, 0, startDoy));
   const d2 = new Date(Date.UTC(baseYear, 0, startDoy + spanDays));
   const day1 = d1.getUTCDate();
-  const m1 = TR_MONTH_NAMES[d1.getUTCMonth()];
+  const m1 = EN_MONTH_NAMES[d1.getUTCMonth()];
   const day2 = d2.getUTCDate();
-  const m2 = TR_MONTH_NAMES[d2.getUTCMonth()];
+  const m2 = EN_MONTH_NAMES[d2.getUTCMonth()];
   if (m1 === m2) {
-    return `${day1}–${day2} ${m1}`;
+    return `${m1} ${day1}–${day2}`;
   }
-  return `${day1} ${m1} – ${day2} ${m2}`;
+  return `${m1} ${day1} – ${m2} ${day2}`;
 }
 
 function buildDynamicPlantingWindow({
@@ -75,8 +75,6 @@ function buildDynamicPlantingWindow({
 }) {
   const base = CROP_BASE_SOWING_DOY[cropId] || CROP_BASE_SOWING_DOY.wheat;
 
-  // Regional thermal offset for baseline sowing:
-  // Warmer regions sow autumn crops slightly later and spring crops earlier.
   const thermalDelta = tempC - 10.5;
   const regionalBaselineOffset = base.isSpring
     ? Math.round(-thermalDelta * 1.35)
@@ -85,14 +83,14 @@ function buildDynamicPlantingWindow({
   const baselineStartDoy = base.doy + Math.max(-14, Math.min(14, regionalBaselineOffset));
 
   if (idx === 0) {
-    return `${formatDoyRange(baselineStartDoy, base.span)} (Bölgesel Klasik Takvim)`;
+    return `${formatDoyRange(baselineStartDoy, base.span)} (Regional Standard Calendar)`;
   }
 
   const soilShiftDays =
     soilType === 'kumlu' ? 4
     : soilType === 'tinli' ? 1
     : soilType === 'kirecli' ? -1
-    : -4; // killi warms slower and holds moisture longer
+    : -4;
 
   const irrigShiftDays =
     irrigation === 'kuru_tarim' ? 3
@@ -110,7 +108,7 @@ function buildDynamicPlantingWindow({
   );
 
   const shiftedStartDoy = baselineStartDoy - earlyDays;
-  return `${formatDoyRange(shiftedStartDoy, base.span)} (-${earlyDays} Gün Erken Ekim)`;
+  return `${formatDoyRange(shiftedStartDoy, base.span)} (-${earlyDays} Days Early Sowing)`;
 }
 
 export function normalizeRotationStrategies(strategies, payload = null, prediction = null) {
@@ -152,7 +150,7 @@ export function normalizeRotationStrategies(strategies, payload = null, predicti
   const budgetOpsFactor =
     (budgetLevel === 'yuksek' ? 1.05 : budgetLevel === 'dusuk' ? 0.94 : 1.0) +
     (machinery.includes('mibzer') ? 0.03 : 0) +
-    (machinery.includes('ilaclama') ? 0.02 : 0) +
+    (machinery.includes('ilaclama') || machinery.includes('pulverizator') ? 0.02 : 0) +
     (machinery.includes('bicerdover') ? 0.02 : 0);
 
   const currentStrategyScore = typeof strategies[0]?.indicativeSuitabilityIndex0to100 === 'number'
@@ -288,11 +286,11 @@ export function normalizeRotationStrategies(strategies, payload = null, predicti
       score,
       plantingWindow,
       waterSaving,
-      yieldDeltaText: isCurrent ? `-%${estLossPct} Kayıp Riski` : `+%${yieldGainPct} Verim Koruma`,
+      yieldDeltaText: isCurrent ? `-${estLossPct}% Yield Loss Risk` : `+${yieldGainPct}% Yield Protection`,
       financialTotal,
       financialDiffText: isCurrent
-        ? `Referans Senaryo (${area} da)`
-        : `+${diff.toLocaleString('tr-TR')} ₺ Net Kazanç Farkı`
+        ? `Baseline Scenario (${area} da)`
+        : `+${diff.toLocaleString('en-US')} ₺ Net Profit Gain`
     };
   });
 }

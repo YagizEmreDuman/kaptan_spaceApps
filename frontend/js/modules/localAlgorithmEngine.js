@@ -47,10 +47,10 @@ const CROP_AGRONOMY = {
 
 function finite(value, label, low = null, high = null) {
   if (typeof value === 'boolean' || typeof value !== 'number' || !Number.isFinite(value)) {
-    throw new Error(`${label} sayisal ve sonlu olmali`);
+    throw new Error(`${label} must be a finite number`);
   }
   if ((low !== null && value < low) || (high !== null && value > high)) {
-    throw new Error(`${label} ${low} ile ${high} arasinda olmali`);
+    throw new Error(`${label} must be between ${low} and ${high}`);
   }
   return value;
 }
@@ -61,7 +61,7 @@ function optionalNumber(obj, field, label, low = null, high = null) {
 }
 
 function band(value) {
-  return value < 30 ? 'dusuk' : value < 60 ? 'orta' : 'yuksek';
+  return value < 30 ? 'low' : value < 60 ? 'medium' : 'high';
 }
 
 function interpolateGridPoint(lat, lon) {
@@ -200,21 +200,21 @@ function scoreRotationCandidate({
   suitability = Math.round(Math.min(96, Math.max(16, suitability)));
 
   const benefit = sameCrop
-    ? `${a.name_tr} üst üste ekildiğinde toprakta spesifik kök hastalıkları (pas/fusarium) ve aynı katmandan su/besin çekimi nedeniyle verim baskısı oluşur.`
+    ? `Continuous ${a.name_tr} monoculture increases root disease pressure (rust/fusarium) and depletes nutrients from the same soil horizon.`
     : legumeBreak
-      ? `Tahıl sonrası ${b.name_tr} rotasyonu toprakta simbiyotik azot bağlar, kök çürüklüğü döngüsünü kırar ve su stresini dengeler.`
+      ? `Rotating from cereal to ${b.name_tr} fixes biological nitrogen in the soil, breaks the root-rot cycle, and improves drought resilience.`
       : !sameFamily
-        ? `${a.name_tr} → ${b.name_tr} geçişi farklı kök derinlikleriyle toprak nemini (WET3) ve besin elementlerini dengeli kullanır.`
-        : `${a.name_tr} → ${b.name_tr} geçişi iklim toleransını değiştirir ancak aynı bitki ailesi olduğu için yaprak hastalıkları izlenmelidir.`;
+        ? `Transitioning from ${a.name_tr} to ${b.name_tr} diversifies rooting depth and balances root-zone moisture (WET3) and soil nutrients.`
+        : `Transitioning from ${a.name_tr} to ${b.name_tr} shifts thermal tolerance, though foliar diseases should be monitored within the same plant family.`;
 
   const concerns = [];
-  if (sameFamily) concerns.push('Aynı bitki ailesinde tekrar: yaprak mantarı (pas/septorya) ve besin dengesi takip edilmeli');
-  if (legumeBreak) concerns.push('Baklagil sonrası üst gübrelemede azot dozu %20–25 azaltılarak girdi tasarrufu sağlanabilir');
-  if (soilType === 'kumlu') concerns.push('Kumlu toprak dokusunda su tutma kapasitesi düşük olduğundan organik madde ve erken ekim kritik önemdedir');
-  if (soilType === 'killi') concerns.push('Killi toprakta ilkbahar ısınması geç gerçekleşir; ağır tavda toprak işlemeden kaçınılmalıdır');
-  if (soilType === 'kirecli') concerns.push('Kireçli toprakta fosfor ve çinko bağlanmasına karşı taban gübresinde mikro element takviyesi önerilir');
-  if (irrigated === false) concerns.push('Kuru tarım koşullarında toprak nemini korumak için erken ekim ve minimum toprak işleme önerilir');
-  else concerns.push('Kritik çiçeklenme ve dane dolum dönemlerinde toprak nemi (WET3) takibiyle sulama optimize edilmeli');
+  if (sameFamily) concerns.push('Same plant family repetition: monitor foliar fungal pressure (rust/septoria) and nutrient balance');
+  if (legumeBreak) concerns.push('Post-legume nitrogen top-dressing can be reduced by 20–25% to save input costs');
+  if (soilType === 'kumlu') concerns.push('Sandy soil has low water retention; organic matter incorporation and early sowing are critical');
+  if (soilType === 'killi') concerns.push('Clay soil warms up slower in spring; avoid heavy tillage when wet to prevent compaction');
+  if (soilType === 'kirecli') concerns.push('Calcareous soil may lock phosphorus and zinc; starter fertilizer with micronutrients is advised');
+  if (irrigated === false) concerns.push('Under rainfed farming, early sowing and conservation tillage are recommended to preserve soil moisture');
+  else concerns.push('Optimize irrigation scheduling during flowering and grain filling by tracking root-zone soil wetness (WET3)');
 
   return {
     seq,
@@ -258,22 +258,22 @@ export function assessLocal(payload) {
   const requested = userForecast.month || '2026-11';
 
   if (!FORECAST_MONTHS.includes(requested)) {
-    throw new Error(`Tahmin ayi bulunamadi. Mevcut aylar: ${FORECAST_MONTHS.join(', ')}`);
+    throw new Error(`Forecast month not found. Available months: ${FORECAST_MONTHS.join(', ')}`);
   }
 
   const current = farmer.currentRotation || ['wheat', 'wheat'];
   if (!Array.isArray(current) || current.length === 0 || current.some(c => !CROP_CATALOG[c])) {
-    throw new Error('currentRotation urun kodlari listesi olmali');
+    throw new Error('currentRotation must be a list of valid crop IDs');
   }
   const allowed = farmer.availableCrops || Object.keys(CROP_CATALOG);
   if (!Array.isArray(allowed) || allowed.some(c => !CROP_CATALOG[c])) {
-    throw new Error('availableCrops katalogdaki urunlerden olusmali');
+    throw new Error('availableCrops must consist of catalog crop IDs');
   }
 
   const maxEt = optionalNumber(farmer, 'maxSeasonalCropWaterNeedMm', 'maxSeasonalCropWaterNeedMm', 1, 5000);
   const irrigated = farmer.irrigationAvailable;
   if (irrigated !== undefined && irrigated !== null && typeof irrigated !== 'boolean') {
-    throw new Error('irrigationAvailable true/false olmali');
+    throw new Error('irrigationAvailable must be true or false');
   }
 
   const soilType = farmer.soilType || 'tinli';
@@ -293,8 +293,6 @@ export function assessLocal(payload) {
     const monthNum = Number(month.slice(5, 7));
     const isWinter = monthNum === 11 || monthNum === 12 || monthNum === 1 || monthNum === 2;
     const isSpring = monthNum === 3 || monthNum === 4 || monthNum === 5;
-    // CMIP6 SSP2-4.5 / HighResMIP regional seasonal factor for Turkey:
-    // Black Sea (lat > 40.3) sees slight winter precipitation increase; Mediterranean/Southern & Inland see spring/summer drying.
     const latFactor = (pt.lat - 38.5) * (isWinter ? 0.028 : -0.015);
     const seasonFactor = isWinter ? -0.04 : isSpring ? -0.09 : -0.16;
     const thermalFactor = typeof tempDiffC === 'number' ? -tempDiffC * 0.018 : 0;
@@ -483,8 +481,8 @@ export function assessLocal(payload) {
     rotationStrategies: results,
     modelType: 'explainable_heuristic_no_trained_ml',
     limitations: [
-      'Aylık sıcaklık ve kök bölgesi nem tahminleri NASA GEOS-S2S, tarihsel referans ve yağış serileri NASA POWER (2006–2025) verilerine dayanır.',
-      'Uygunluk puanları, ekim pencereleri ve gelir projeksiyonları seçilen koordinatın NASA iklim göstergeleri, toprak tipi, pH, sulama yöntemi ve parsel alanına göre dinamik hesaplanır.'
+      'Monthly temperature and root-zone soil wetness forecasts are sourced from NASA GEOS-S2S; historical baseline and rainfall series are sourced from NASA POWER (2006–2025).',
+      'Suitability scores, planting windows, and financial projections are dynamically computed from NASA climate indicators, soil structure, pH, irrigation system, and parcel area.'
     ],
     sources: ['https://www.fao.org/4/s2022e/s2022e07.htm', 'https://www.fao.org/4/Y5146E/y5146e0a.htm']
   };
@@ -555,9 +553,10 @@ export async function fetchBrowserWeatherAndTasks(lat, lng, payload = null) {
       cmip6MonthlyRain = null;
     }
   }
+
   const daily = data.daily;
   if (!Array.isArray(daily?.time) || daily.time.length === 0) {
-    throw new Error('Günlük hava verisi bulunamadı.');
+    throw new Error('Daily weather data unavailable.');
   }
   const forecastList = daily.time.map((date, i) => ({
     date,
@@ -570,49 +569,54 @@ export async function fetchBrowserWeatherAndTasks(lat, lng, payload = null) {
   }));
 
   const cropId = payload?.cropAndResources?.targetCrop || 'wheat';
-  const cropName = CROP_CATALOG[cropId]?.name_tr || 'Ürün';
+  const cropName = CROP_CATALOG[cropId]?.name_tr || 'Crop';
   const soilType = payload?.soil?.type || 'tinli';
   const irrigation = payload?.cropAndResources?.irrigation || 'kuru_tarim';
   const soilLabel =
-    soilType === 'killi' ? 'Killi toprak'
-    : soilType === 'kumlu' ? 'Kumlu toprak'
-    : soilType === 'kirecli' ? 'Kireçli toprak'
-    : 'Tınlı toprak';
+    soilType === 'killi' ? 'Clay soil'
+    : soilType === 'kumlu' ? 'Sandy soil'
+    : soilType === 'kirecli' ? 'Calcareous soil'
+    : 'Loamy soil';
+  const irrigLabel =
+    irrigation === 'damla_sulama' ? 'drip irrigation'
+    : irrigation === 'yagmurlama' ? 'sprinkler irrigation'
+    : irrigation === 'salma_sulama' ? 'flood irrigation'
+    : 'rainfed';
 
   const tasks = [];
   for (const day of forecastList) {
     if (day.minTemp !== null && day.minTemp <= 0) {
       tasks.push({
         date: day.date,
-        type: 'UYARI',
-        task: `${cropName} parselinde don riskine karşı saha ve ${irrigation === 'kuru_tarim' ? 'çıkış' : 'sulama hattı'} kontrolü`,
-        reason: `Tahmini en düşük sıcaklık ${day.minTemp} °C (${soilLabel}).`
+        type: 'WARNING',
+        task: `Inspect ${cropName} parcel and ${irrigation === 'kuru_tarim' ? 'seedling emergence' : 'irrigation lines'} for frost risk`,
+        reason: `Forecast minimum temperature is ${day.minTemp} °C (${soilLabel}).`
       });
     }
     if (day.rainMm !== null && day.rainMm > 5) {
       tasks.push({
         date: day.date,
-        type: 'BİLGİ',
+        type: 'INFO',
         task: soilType === 'killi'
-          ? `${cropName} için yağış öncesi gübrelemeyi tamamlayın; killi toprakta çamur tavda tarlaya girmeyin`
-          : `${cropName} için yağış öncesi üst gübreleme ve toprak hazırlığını tamamlayın`,
-        reason: `Tahmini günlük toplam yağış ${day.rainMm} mm (${soilLabel}).`
+          ? `Complete ${cropName} top-dressing before rainfall; avoid heavy machinery on wet clay soil`
+          : `Complete ${cropName} fertilizer application and seedbed preparation ahead of rainfall`,
+        reason: `Forecast daily precipitation is ${day.rainMm} mm (${soilLabel}).`
       });
     }
     if (day.humidity !== null && day.humidity >= 75 && day.maxTemp !== null && day.maxTemp >= 12) {
       tasks.push({
         date: day.date,
-        type: 'UYARI',
-        task: `${cropName} yapraklarında yüksek nem kaynaklı mantar (pas/septorya/antraknoz) gözlemi yapın`,
-        reason: `Ortalama bağıl nem %${day.humidity}, en yüksek sıcaklık ${day.maxTemp} °C.`
+        type: 'WARNING',
+        task: `Scout ${cropName} foliage for high-humidity fungal diseases (rust/septoria/blight)`,
+        reason: `Mean relative humidity is ${day.humidity}% with a high of ${day.maxTemp} °C.`
       });
     }
     if (day.windKmh !== null && day.windKmh >= 28 && tasks.length < 8) {
       tasks.push({
         date: day.date,
-        type: 'UYARI',
-        task: `Rüzgâr sürüklenme riski nedeniyle ${cropName} ilaçlama ve yaprak gübresi uygulamasını erteleyin`,
-        reason: `Tahmini maksimum rüzgâr hızı ${day.windKmh} km/sa.`
+        type: 'WARNING',
+        task: `Postpone ${cropName} spraying and foliar feeding due to wind drift risk`,
+        reason: `Forecast maximum wind speed is ${day.windKmh} km/h.`
       });
     }
   }
@@ -621,25 +625,25 @@ export async function fetchBrowserWeatherAndTasks(lat, lng, payload = null) {
   if (total14DayRain < 8 && forecastList.length > 0) {
     tasks.push({
       date: forecastList[Math.min(2, forecastList.length - 1)].date,
-      type: 'PLANLAMA',
+      type: 'PLANNING',
       task: irrigation === 'kuru_tarim'
-        ? `${soilLabel} parselde nem kaybını önlemek için ${cropName} tohum yatağında yüzeysel malçlama/merdane uygulayın`
-        : `14 günlük yağış düşük (${total14DayRain.toFixed(1)} mm); ${cropName} için ${irrigation.replace('_', ' ')} programını devreye alın`,
-      reason: `14 günlük toplam beklenen yağış yalnızca ${total14DayRain.toFixed(1)} mm.`
+        ? `Apply shallow mulching/rolling on ${soilLabel} parcel to conserve seedbed moisture for ${cropName}`
+        : `Low 14-day rainfall (${total14DayRain.toFixed(1)} mm); schedule ${irrigLabel} cycle for ${cropName}`,
+      reason: `Total expected 14-day rainfall is only ${total14DayRain.toFixed(1)} mm.`
     });
   } else if (tasks.length === 0 && forecastList.length > 0) {
     tasks.push({
       date: forecastList[0].date,
-      type: 'PLANLAMA',
-      task: `${soilLabel} yapısında ${cropName} için 5–10 cm derinlikte tav kontrolü yapın ve ekim/bakım hazırlığını başlatın`,
-      reason: 'Önümüzdeki günlerde ekstrem yağış veya don uyarısı bulunmuyor; saha operasyonları için uygun pencere.'
+      type: 'PLANNING',
+      task: `Check seedbed moisture at 5–10 cm depth on ${soilLabel} and initiate field operations for ${cropName}`,
+      reason: 'No extreme rainfall or frost warnings in the upcoming window; favorable conditions for field work.'
     });
   }
   return {
     forecast14Days: forecastList,
     taskCalendar: tasks,
     cmip6MonthlyRain,
-    source: 'Open-Meteo Canlı Servisi',
+    source: 'Open-Meteo Live Service',
     timezone: data.timezone || null,
     fetchedAt: new Date().toISOString()
   };

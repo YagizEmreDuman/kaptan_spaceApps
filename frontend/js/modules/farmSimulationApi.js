@@ -3,9 +3,9 @@ import { assessLocal } from './localAlgorithmEngine.js';
 
 const isBrowser = typeof globalThis.window !== 'undefined';
 
-// Uses the existing Node proxy, which forwards the unchanged body to POST :5000/predict.
+// Uses the existing Node proxy in non-browser tests, and the browser engine in live UI.
 export async function requestFarmPrediction(body, signal) {
-  if (isBackendOffline()) {
+  if (isBrowser || isBackendOffline()) {
     return assessLocal(body);
   }
   try {
@@ -16,10 +16,7 @@ export async function requestFarmPrediction(body, signal) {
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || data.detail || `HTTP ${response.status}`);
     if (!data.simulationResult?.scenarioAnalysis || !Array.isArray(data.simulationResult.rotationStrategies)) {
-      throw new Error('Karar motoru simülasyon göstergelerini döndürmedi.');
-    }
-    if (isBrowser && data.simulationResult?.climateSummary?.usedInRotationScoring === false) {
-      return assessLocal(body);
+      throw new Error('Decision engine did not return simulation indicators.');
     }
     return data.simulationResult;
   } catch (error) {

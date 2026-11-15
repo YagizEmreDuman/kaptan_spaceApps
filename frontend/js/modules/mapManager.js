@@ -39,7 +39,7 @@ export function initMapManager() {
 
   globalMapInstance = map;
 
-  // API Anahtarı Gerektirmeyen Ücretsiz Katmanlar
+  // Free Tile Layers Without API Key
   const osmStreetTiles = L.tileLayer(
     'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {
@@ -60,11 +60,11 @@ export function initMapManager() {
 
   osmStreetTiles.addTo(map);
 
-  // Sağ üst köşeye Harita / Uydu geçiş anahtarı ekle
+  // Add Map / Satellite layer switcher to top right
   L.control.layers(
     {
-      '🗺️ Harita': osmStreetTiles,
-      '🛰️ Uydu': esriSatelliteTiles
+      '🗺️ Map': osmStreetTiles,
+      '🛰️ Satellite': esriSatelliteTiles
     },
     null,
     { position: 'topright' }
@@ -88,8 +88,8 @@ export function initMapManager() {
 
     const fixedLat = lat.toFixed(4);
     const fixedLng = lng.toFixed(4);
-    const latDir = lat >= 0 ? 'K' : 'G';
-    const lngDir = lng >= 0 ? 'D' : 'B';
+    const latDir = lat >= 0 ? 'N' : 'S';
+    const lngDir = lng >= 0 ? 'E' : 'W';
 
     if (latInput) latInput.value = fixedLat;
     if (lngInput) lngInput.value = fixedLng;
@@ -152,10 +152,10 @@ export function initMapManager() {
           zoom: 8
         });
       } else {
-        alert('Konum bulunamadı. Farklı bir şehir veya ülke adı deneyin.');
+        alert('Location not found. Try a different city or country name.');
       }
     } catch {
-      alert('Arama servisine bağlanılamadı, haritadan doğrudan tıklayarak seçebilirsiniz.');
+      alert('Could not connect to the search service; you can select directly by clicking on the map.');
     } finally {
       if (searchBtn) searchBtn.textContent = origLabel;
     }
@@ -190,7 +190,7 @@ export function initMapManager() {
         },
         () => {
           locateBtn.textContent = origText;
-          alert('Konum izni alınamadı. Haritaya tıklayarak pin bırakabilirsiniz.');
+          alert('Location permission denied. You can drop a pin by clicking on the map.');
         }
       );
     });

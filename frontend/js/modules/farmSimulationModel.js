@@ -1,7 +1,7 @@
 import { mapPayloadToAlgorithm } from './apiClient.js';
 
 // Animation seconds only. These durations are UI timing, not biological rates.
-export const STAGES = ['Tohum / ekim', 'Çimlenme', 'Büyüme', 'Gelişmiş bitki', 'Hasada hazır (temsili)'];
+export const STAGES = ['Seed / Sowing', 'Germination', 'Vegetative Growth', 'Mature Plant', 'Ready for Harvest (Illustrative)'];
 export const ANIMATION_DURATION_SECONDS = 30;
 
 export class FarmClock {

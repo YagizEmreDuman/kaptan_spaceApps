@@ -16,22 +16,22 @@ app.get('/api/config.js', (_req, res) => {
         .send('globalThis.CROPGUARD_API_BASE_URL = location.origin + "/api";');
 });
 
-// Ana kontrol ucu
+// Health check endpoint
 app.get('/api/health', (req, res) => {
     res.json({ status: 'active', team: 'Kaptan', service: 'CropGuard AI Backend' });
 });
 
-// Tüm API uçlarını /api altına bağla
+// Mount all API routes under /api
 app.use('/api', apiRoutes);
 app.use(express.static(path.join(__dirname, '../frontend')));
 
 if (require.main === module) app.listen(PORT, (error) => {
     if (error) {
-        console.error(`Backend başlatılamadı: ${error.message}`);
+        console.error(`Failed to start backend: ${error.message}`);
         process.exitCode = 1;
         return;
     }
-    console.log(`🚀 Kaptan Backend http://localhost:${PORT} adresinde çalışıyor!`);
+    console.log(`🚀 Kaptan Backend running at http://localhost:${PORT}!`);
 });
 
 module.exports = app;

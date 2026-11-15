@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -17,7 +17,7 @@
 </head>
 <body class="bg-gradient-to-br from-sky-50 via-emerald-50/40 to-amber-50/50 text-slate-800 min-h-screen flex flex-col antialiased selection:bg-emerald-200 selection:text-emerald-900">
 
-  <!-- Üst Telemetri & Dil Barı -->
+  <!-- Top Telemetry Bar -->
   <header class="border-b border-sky-200/80 bg-white/90 backdrop-blur-md sticky top-0 z-30 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2">
       <div class="flex items-center gap-3 min-w-0">
@@ -32,7 +32,7 @@
             <h1 class="font-bold text-lg tracking-tight text-slate-900">CropGuard <span class="text-emerald-600">AI</span></h1>
             <span class="text-[11px] font-mono font-semibold px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 border border-amber-300">KAPTAN</span>
           </div>
-          <p data-i18n="header_subtitle" class="text-xs text-slate-500 hidden sm:block truncate">İklim Anomalilerine Karşı Dinamik Ekim & Rotasyon Optimizasyonu</p>
+          <p data-i18n="header_subtitle" class="text-xs text-slate-500 hidden sm:block truncate">Dynamic Planting &amp; Crop Rotation Optimization Against Climate Anomalies</p>
         </div>
       </div>
 
@@ -43,52 +43,39 @@
           data-i18n="back_to_setup"
           class="hidden items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-100 hover:bg-sky-200 border border-sky-300 text-sky-900 font-sans font-semibold text-xs transition cursor-pointer"
         >
-          ← Tarlayı Düzenle
+          ← Edit Field
         </button>
 
         <span id="header-coords" class="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-sky-50 border border-sky-200 text-sky-800">
-          📍 37.87°K, 32.49°D
+          📍 37.87°N, 32.49°E
         </span>
-
-        <select
-          id="language-switcher"
-          aria-label="Language"
-          class="bg-white hover:bg-sky-50 border border-sky-300 rounded-xl px-2.5 py-1.5 text-xs font-sans font-medium text-slate-700 focus:outline-none focus:border-emerald-500 transition cursor-pointer"
-        >
-          <option value="tr">🇹🇷 Türkçe</option>
-          <option value="en">🇬🇧 English</option>
-          <option value="es">🇪🇸 Español</option>
-          <option value="pt">🇵🇹 Português</option>
-          <option value="de">🇩🇪 Deutsch</option>
-          <option value="nl">🇳🇱 Nederlands</option>
-        </select>
       </div>
     </div>
   </header>
 
   <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
-    <!-- AŞAMA 1: TAM EKRAN TARLA KURULUMU & DÜNYA HARİTASI -->
+    <!-- STEP 1: FULL-SCREEN FIELD SETUP & WORLD MAP -->
     <section id="setup-screen" class="glass-panel rounded-3xl p-5 sm:p-8 flex flex-col gap-6">
       <div class="flex flex-wrap items-center justify-between gap-3 border-b border-sky-100 pb-4">
         <div>
-          <span data-i18n="step_badge" class="text-[11px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800">ADIM 1 / 2 • TARLA KURULUMU</span>
-          <h2 data-i18n="left_title" class="text-xl sm:text-2xl font-bold text-slate-900 mt-1.5">Konum & Tarla Profili</h2>
-          <p data-i18n="left_subtitle" class="text-xs sm:text-sm text-slate-600">Dünya haritasından tarlanızı seçin, toprak ve mevcut ürün bilgilerinizi girin.</p>
+          <span data-i18n="step_badge" class="text-[11px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800">STEP 1 / 2 • FIELD SETUP</span>
+          <h2 data-i18n="left_title" class="text-xl sm:text-2xl font-bold text-slate-900 mt-1.5">Location &amp; Field Profile</h2>
+          <p data-i18n="left_subtitle" class="text-xs sm:text-sm text-slate-600">Select your parcel on the world map and enter soil and current crop details.</p>
         </div>
         <button type="button" id="quick-demo-btn" data-i18n="btn_quick_demo" class="px-4 py-2 rounded-xl bg-amber-100 hover:bg-amber-200 text-xs font-semibold text-amber-900 border border-amber-300 transition cursor-pointer">
-          ⚡ Seçili Tarlayı Analiz Et
+          ⚡ Analyze Selected Field
         </button>
       </div>
 
-      <p id="data-setup-status" role="status" aria-live="polite" class="text-xs text-slate-600">Algorithm verileri bekleniyor…</p>
+      <p id="data-setup-status" role="status" aria-live="polite" class="text-xs text-slate-600">Loading algorithm catalog…</p>
 
       <form id="advisor-form" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
-        <!-- SOL 7 KOLON: GENİŞ ONLINE DÜNYA HARİTASI & ARAMA -->
+        <!-- LEFT 7 COLUMNS: INTERACTIVE WORLD MAP & SEARCH -->
         <div class="lg:col-span-7 flex flex-col gap-3">
           <div class="flex items-center justify-between">
-            <label data-i18n="sec1_title" class="text-xs font-bold uppercase tracking-wider text-emerald-700">1. Tarla Konumu (Dünya Haritası)</label>
+            <label data-i18n="sec1_title" class="text-xs font-bold uppercase tracking-wider text-emerald-700">1. Field Location (World Map)</label>
             <span id="coord-badge" class="text-xs font-mono font-semibold px-2.5 py-0.5 rounded-lg bg-sky-50 border border-sky-200 text-sky-800">
               37.8746, 32.4932
             </span>
@@ -100,7 +87,7 @@
                 type="text"
                 id="map-search-input"
                 data-i18n-placeholder="search_placeholder"
-                placeholder="Şehir veya ülke ara (Örn: Konya, Iowa, Madrid)..."
+                placeholder="Search city or country (e.g., Konya, Iowa, Madrid)..."
                 class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-emerald-500"
               />
               <button
@@ -109,24 +96,24 @@
                 data-i18n="btn_search"
                 class="px-3 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold transition cursor-pointer shrink-0"
               >
-                Ara
+                Search
               </button>
             </div>
 
             <select id="region" name="region" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 focus:outline-none focus:border-emerald-500">
-              <option value="konya" data-lat="37.8746" data-lng="32.4932" data-i18n="region_konya">🇹🇷 Türkiye — Konya Ovası</option>
-              <option value="cukurova" data-lat="36.9914" data-lng="35.3308" data-i18n="region_cukurova">🇹🇷 Türkiye — Çukurova (Adana)</option>
-              <option value="ankara" data-lat="39.9334" data-lng="32.8597" data-i18n="region_ankara">🇹🇷 Türkiye — Ankara</option>
-              <option value="custom" data-lat="39.0000" data-lng="35.0000" data-i18n="region_custom">📍 Özel Koordinat (Haritadan Seçildi)</option>
+              <option value="konya" data-lat="37.8746" data-lng="32.4932" data-i18n="region_konya">🇹🇷 Turkey — Konya Plain</option>
+              <option value="cukurova" data-lat="36.9914" data-lng="35.3308" data-i18n="region_cukurova">🇹🇷 Turkey — Çukurova (Adana)</option>
+              <option value="ankara" data-lat="39.9334" data-lng="32.8597" data-i18n="region_ankara">🇹🇷 Turkey — Ankara</option>
+              <option value="custom" data-lat="39.0000" data-lng="35.0000" data-i18n="region_custom">📍 Custom Coordinates (Selected on Map)</option>
             </select>
           </div>
 
           <div class="relative rounded-2xl overflow-hidden border-2 border-sky-200 shadow-sm">
             <div id="field-map" class="w-full z-10"></div>
             <div class="bg-sky-50 px-3 py-2 border-t border-sky-200 flex items-center justify-between text-xs text-slate-600">
-              <span data-i18n="map_hint">💡 Haritaya tıklayarak veya pini sürükleyerek konum seçin</span>
+              <span data-i18n="map_hint">💡 Click on the map or drag the pin to set location</span>
               <button type="button" id="locate-me-btn" data-i18n="locate_me" class="text-emerald-700 hover:text-emerald-800 font-bold cursor-pointer">
-                📍 Konumumu Bul
+                📍 Locate Me
               </button>
             </div>
           </div>
@@ -135,139 +122,139 @@
           <input type="hidden" id="lng-input" name="longitude" value="32.4932" />
         </div>
 
-        <!-- SAĞ 5 KOLON: TARLA FORMU -->
+        <!-- RIGHT 5 COLUMNS: FIELD FORM -->
         <div class="lg:col-span-5 flex flex-col gap-4 bg-white/80 rounded-2xl p-4 sm:p-5 border border-sky-100">
 
           <div class="flex flex-col gap-2">
             <div class="flex items-center justify-between">
-              <label data-i18n="sec2_title" class="text-xs font-bold uppercase tracking-wider text-emerald-700">2. Toprak Yapısı</label>
-              <span id="soil-risk-hint" data-i18n="soil_hint_default" class="text-[11px] font-medium text-emerald-700">Dengeli nem tutulumu</span>
+              <label data-i18n="sec2_title" class="text-xs font-bold uppercase tracking-wider text-emerald-700">2. Soil Structure</label>
+              <span id="soil-risk-hint" data-i18n="soil_hint_default" class="text-[11px] font-medium text-emerald-700">Balanced moisture retention</span>
             </div>
 
             <div class="grid grid-cols-2 gap-2">
               <label class="cursor-pointer">
                 <input type="radio" name="soilType" value="tinli" class="sr-only peer" checked />
                 <div class="chip-box p-2.5 rounded-xl border border-slate-300 text-xs text-slate-700 peer-checked:border-emerald-500 peer-checked:bg-emerald-50 peer-checked:text-emerald-800">
-                  <div data-i18n="soil_loam" class="font-semibold">🟫 Tınlı Toprak</div>
-                  <div data-i18n="soil_loam_desc" class="text-[10px] text-slate-500">İdeal drenaj</div>
+                  <div data-i18n="soil_loam" class="font-semibold">🟫 Loamy Soil</div>
+                  <div data-i18n="soil_loam_desc" class="text-[10px] text-slate-500">Ideal drainage</div>
                 </div>
               </label>
 
               <label class="cursor-pointer">
                 <input type="radio" name="soilType" value="killi" class="sr-only peer" />
                 <div class="chip-box p-2.5 rounded-xl border border-slate-300 text-xs text-slate-700 peer-checked:border-emerald-500 peer-checked:bg-emerald-50 peer-checked:text-emerald-800">
-                  <div data-i18n="soil_clay" class="font-semibold">🧱 Killi Toprak</div>
-                  <div data-i18n="soil_clay_desc" class="text-[10px] text-slate-500">Yüksek nem tutar</div>
+                  <div data-i18n="soil_clay" class="font-semibold">🧱 Clay Soil</div>
+                  <div data-i18n="soil_clay_desc" class="text-[10px] text-slate-500">High moisture retention</div>
                 </div>
               </label>
 
               <label class="cursor-pointer">
                 <input type="radio" name="soilType" value="kumlu" class="sr-only peer" />
                 <div class="chip-box p-2.5 rounded-xl border border-slate-300 text-xs text-slate-700 peer-checked:border-emerald-500 peer-checked:bg-emerald-50 peer-checked:text-emerald-800">
-                  <div data-i18n="soil_sandy" class="font-semibold">🏜️ Kumlu Toprak</div>
-                  <div data-i18n="soil_sandy_desc" class="text-[10px] text-slate-500">Hızlı kuruma</div>
+                  <div data-i18n="soil_sandy" class="font-semibold">🏜️ Sandy Soil</div>
+                  <div data-i18n="soil_sandy_desc" class="text-[10px] text-slate-500">Fast drying</div>
                 </div>
               </label>
 
               <label class="cursor-pointer">
                 <input type="radio" name="soilType" value="kirecli" class="sr-only peer" />
                 <div class="chip-box p-2.5 rounded-xl border border-slate-300 text-xs text-slate-700 peer-checked:border-emerald-500 peer-checked:bg-emerald-50 peer-checked:text-emerald-800">
-                  <div data-i18n="soil_calc" class="font-semibold">🪨 Kireçli Toprak</div>
-                  <div data-i18n="soil_calc_desc" class="text-[10px] text-slate-500">Yüksek pH eğilimi</div>
+                  <div data-i18n="soil_calc" class="font-semibold">🪨 Calcareous Soil</div>
+                  <div data-i18n="soil_calc_desc" class="text-[10px] text-slate-500">High pH tendency</div>
                 </div>
               </label>
             </div>
 
             <div class="grid grid-cols-2 gap-2.5 mt-1">
               <div>
-                <label for="soil-ph" data-i18n="soil_ph_label" class="block text-[11px] font-medium text-slate-600 mb-1">Toprak pH</label>
+                <label for="soil-ph" data-i18n="soil_ph_label" class="block text-[11px] font-medium text-slate-600 mb-1">Soil pH</label>
                 <select id="soil-ph" name="soilPh" class="w-full bg-white border border-slate-300 rounded-xl px-2.5 py-2 text-xs text-slate-800">
-                  <option value="notr" selected data-i18n="ph_neutral">Nötr (6.5–7.5)</option>
-                  <option value="asidik" data-i18n="ph_acidic">Asidik (&lt; 6.5)</option>
-                  <option value="alkali" data-i18n="ph_alkaline">Alkali (&gt; 7.5)</option>
+                  <option value="notr" selected data-i18n="ph_neutral">Neutral (6.5–7.5)</option>
+                  <option value="asidik" data-i18n="ph_acidic">Acidic (&lt; 6.5)</option>
+                  <option value="alkali" data-i18n="ph_alkaline">Alkaline (&gt; 7.5)</option>
                 </select>
               </div>
               <div>
-                <label for="field-area" data-i18n="area_label" class="block text-[11px] font-medium text-slate-600 mb-1">Alan (Dekar)</label>
+                <label for="field-area" data-i18n="area_label" class="block text-[11px] font-medium text-slate-600 mb-1">Area (Decares)</label>
                 <input type="number" id="field-area" name="fieldArea" min="1" max="50000" value="120" required class="w-full bg-white border border-slate-300 rounded-xl px-2.5 py-2 text-xs font-mono text-slate-800" />
               </div>
             </div>
           </div>
 
           <div class="flex flex-col gap-2.5 border-t border-sky-100 pt-3">
-            <label data-i18n="sec3_title" class="text-xs font-bold uppercase tracking-wider text-emerald-700">3. Mevcut Ürün & İmkânlar</label>
+            <label data-i18n="sec3_title" class="text-xs font-bold uppercase tracking-wider text-emerald-700">3. Current Crop &amp; Resources</label>
 
             <div class="grid grid-cols-2 gap-2.5">
               <div>
-                <label for="target-crop" data-i18n="crop_label" class="block text-[11px] font-medium text-slate-600 mb-1">Mevcut Ana Ürün</label>
+                <label for="target-crop" data-i18n="crop_label" class="block text-[11px] font-medium text-slate-600 mb-1">Current Main Crop</label>
                 <select id="target-crop" name="targetCrop" required class="w-full bg-white border border-slate-300 rounded-xl px-2.5 py-2 text-xs text-slate-800">
-                  <option value="wheat" selected>Buğday</option>
-                  <option value="barley">Arpa</option>
-                  <option value="chickpea">Nohut</option>
-                  <option value="lentil">Mercimek</option>
-                  <option value="sunflower">Ayçiçeği</option>
-                  <option value="maize">Mısır</option>
+                  <option value="wheat" selected>Wheat</option>
+                  <option value="barley">Barley</option>
+                  <option value="chickpea">Chickpea</option>
+                  <option value="lentil">Lentil</option>
+                  <option value="sunflower">Sunflower</option>
+                  <option value="maize">Maize</option>
                 </select>
               </div>
               <div>
-                <label for="irrigation" data-i18n="irrigation_label" class="block text-[11px] font-medium text-slate-600 mb-1">Sulama İmkânı</label>
+                <label for="irrigation" data-i18n="irrigation_label" class="block text-[11px] font-medium text-slate-600 mb-1">Irrigation System</label>
                 <select id="irrigation" name="irrigation" class="w-full bg-white border border-slate-300 rounded-xl px-2.5 py-2 text-xs text-slate-800">
-                  <option value="damla_sulama" selected data-i18n="irr_drip">💧 Damla Sulama</option>
-                  <option value="yagmurlama" data-i18n="irr_sprinkler">🚿 Yağmurlama / Pivot</option>
-                  <option value="salma_sulama" data-i18n="irr_flood">🌊 Salma Sulama</option>
-                  <option value="kuru_tarim" data-i18n="irr_dry">🌧️ Kuru Tarım</option>
+                  <option value="damla_sulama" selected data-i18n="irr_drip">💧 Drip Irrigation</option>
+                  <option value="yagmurlama" data-i18n="irr_sprinkler">🚿 Sprinkler / Pivot</option>
+                  <option value="salma_sulama" data-i18n="irr_flood">🌊 Flood Irrigation</option>
+                  <option value="kuru_tarim" data-i18n="irr_dry">🌧️ Rainfed / Dry Farming</option>
                 </select>
               </div>
             </div>
 
             <div>
-              <label data-i18n="budget_label" class="block text-[11px] font-medium text-slate-600 mb-1">Girdi & Tohum Bütçesi</label>
+              <label data-i18n="budget_label" class="block text-[11px] font-medium text-slate-600 mb-1">Input &amp; Seed Budget</label>
               <div class="grid grid-cols-3 gap-1.5">
                 <label class="cursor-pointer">
                   <input type="radio" name="budgetLevel" value="dusuk" class="sr-only peer" />
-                  <div data-i18n="budget_low" class="chip-box text-center py-1.5 rounded-xl border border-slate-300 text-xs font-medium peer-checked:border-amber-500 peer-checked:bg-amber-50 peer-checked:text-amber-800">Ekonomik</div>
+                  <div data-i18n="budget_low" class="chip-box text-center py-1.5 rounded-xl border border-slate-300 text-xs font-medium peer-checked:border-amber-500 peer-checked:bg-amber-50 peer-checked:text-amber-800">Economic</div>
                 </label>
                 <label class="cursor-pointer">
                   <input type="radio" name="budgetLevel" value="orta" class="sr-only peer" checked />
-                  <div data-i18n="budget_mid" class="chip-box text-center py-1.5 rounded-xl border border-slate-300 text-xs font-medium peer-checked:border-amber-500 peer-checked:bg-amber-50 peer-checked:text-amber-800">Dengeli</div>
+                  <div data-i18n="budget_mid" class="chip-box text-center py-1.5 rounded-xl border border-slate-300 text-xs font-medium peer-checked:border-amber-500 peer-checked:bg-amber-50 peer-checked:text-amber-800">Balanced</div>
                 </label>
                 <label class="cursor-pointer">
                   <input type="radio" name="budgetLevel" value="yuksek" class="sr-only peer" />
-                  <div data-i18n="budget_high" class="chip-box text-center py-1.5 rounded-xl border border-slate-300 text-xs font-medium peer-checked:border-amber-500 peer-checked:bg-amber-50 peer-checked:text-amber-800">Esnek</div>
+                  <div data-i18n="budget_high" class="chip-box text-center py-1.5 rounded-xl border border-slate-300 text-xs font-medium peer-checked:border-amber-500 peer-checked:bg-amber-50 peer-checked:text-amber-800">Flexible</div>
                 </label>
               </div>
             </div>
 
             <div>
-              <label data-i18n="machinery_label" class="block text-[11px] font-medium text-slate-600 mb-1">Makine Parkı</label>
+              <label data-i18n="machinery_label" class="block text-[11px] font-medium text-slate-600 mb-1">Machinery Fleet</label>
               <div class="flex flex-wrap gap-1.5">
                 <label class="cursor-pointer">
                   <input type="checkbox" name="machinery" value="traktor" class="sr-only peer" checked />
-                  <span data-i18n="mach_tractor" class="inline-block px-2.5 py-1 rounded-full text-[11px] font-medium border border-slate-300 bg-white peer-checked:border-sky-500 peer-checked:bg-sky-50 peer-checked:text-sky-800">🚜 Traktör</span>
+                  <span data-i18n="mach_tractor" class="inline-block px-2.5 py-1 rounded-full text-[11px] font-medium border border-slate-300 bg-white peer-checked:border-sky-500 peer-checked:bg-sky-50 peer-checked:text-sky-800">🚜 Tractor</span>
                 </label>
                 <label class="cursor-pointer">
                   <input type="checkbox" name="machinery" value="mibzer" class="sr-only peer" checked />
-                  <span data-i18n="mach_seeder" class="inline-block px-2.5 py-1 rounded-full text-[11px] font-medium border border-slate-300 bg-white peer-checked:border-sky-500 peer-checked:bg-sky-50 peer-checked:text-sky-800">🌱 Mibzer</span>
+                  <span data-i18n="mach_seeder" class="inline-block px-2.5 py-1 rounded-full text-[11px] font-medium border border-slate-300 bg-white peer-checked:border-sky-500 peer-checked:bg-sky-50 peer-checked:text-sky-800">🌱 Seeder</span>
                 </label>
                 <label class="cursor-pointer">
                   <input type="checkbox" name="machinery" value="pulverizator" class="sr-only peer" />
-                  <span data-i18n="mach_sprayer" class="inline-block px-2.5 py-1 rounded-full text-[11px] font-medium border border-slate-300 bg-white peer-checked:border-sky-500 peer-checked:bg-sky-50 peer-checked:text-sky-800">💨 Pülverizatör</span>
+                  <span data-i18n="mach_sprayer" class="inline-block px-2.5 py-1 rounded-full text-[11px] font-medium border border-slate-300 bg-white peer-checked:border-sky-500 peer-checked:bg-sky-50 peer-checked:text-sky-800">💨 Sprayer</span>
                 </label>
               </div>
             </div>
           </div>
 
-          <label class="text-xs text-slate-600">Analiz ayı
+          <label class="text-xs text-slate-600">Forecast Month
             <select id="forecast-month" name="forecastMonth" required class="mt-1 w-full border border-slate-300 rounded-xl px-3 py-2">
-              <option value="2026-11" selected>Kasım 2026</option>
-              <option value="2026-12">Aralık 2026</option>
-              <option value="2027-01">Ocak 2027</option>
-              <option value="2027-02">Şubat 2027</option>
-              <option value="2027-03">Mart 2027</option>
-              <option value="2027-04">Nisan 2027</option>
-              <option value="2027-05">Mayıs 2027</option>
-              <option value="2027-06">Haziran 2027</option>
-              <option value="2027-07">Temmuz 2027</option>
+              <option value="2026-11" selected>Nov 2026</option>
+              <option value="2026-12">Dec 2026</option>
+              <option value="2027-01">Jan 2027</option>
+              <option value="2027-02">Feb 2027</option>
+              <option value="2027-03">Mar 2027</option>
+              <option value="2027-04">Apr 2027</option>
+              <option value="2027-05">May 2027</option>
+              <option value="2027-06">Jun 2027</option>
+              <option value="2027-07">Jul 2027</option>
             </select>
           </label>
 
@@ -276,14 +263,14 @@
             id="analyze-btn"
             class="mt-2 w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-bold text-sm flex items-center justify-center gap-2 transition shadow-md shadow-emerald-500/25 cursor-pointer"
           >
-            <span data-i18n="btn_run_sim">İklim & Rotasyon Simülasyonunu Çalıştır</span>
+            <span data-i18n="btn_run_sim">Run Climate &amp; Rotation Simulation</span>
             <span>→</span>
           </button>
         </div>
       </form>
     </section>
 
-    <!-- YÜKLENME EKRANI -->
+    <!-- LOADING SCREEN -->
     <section id="api-loading-state" class="hidden glass-panel rounded-3xl p-10 flex-col justify-center items-center text-center min-h-[480px]">
       <div class="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center mb-4">
         <svg class="w-7 h-7 text-emerald-600 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -291,53 +278,53 @@
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
         </svg>
       </div>
-      <h3 data-i18n="loading_title" class="text-lg font-bold text-slate-900">Uydu İklim Verileri & Rotasyon Analiz Ediliyor...</h3>
-      <p class="text-xs text-slate-600 mt-1">Seçtiğiniz koordinat için mevcut tahminler ve rotasyon seçenekleri alınıyor.</p>
+      <h3 data-i18n="loading_title" class="text-lg font-bold text-slate-900">Analyzing Satellite Climate Data &amp; Crop Rotation...</h3>
+      <p class="text-xs text-slate-600 mt-1">Retrieving seasonal forecasts and rotation strategies for the selected coordinates.</p>
     </section>
 
-    <!-- AŞAMA 2: SADELEŞTİRİLMİŞ 3 SEKMELİ ANALİZ EKRANI -->
+    <!-- STEP 2: 4-TAB ANALYSIS SCREEN -->
     <section id="climate-panel" class="hidden flex-col gap-5">
 
       <div id="api-status-banner" class="hidden rounded-xl p-3 border flex-wrap items-center justify-between gap-2 text-xs"></div>
 
-      <!-- TEK CÜMLELİK NET KARAR ÖZETİ KARTI -->
+      <!-- EXECUTIVE DECISION SUMMARY CARD -->
       <div class="glass-panel rounded-2xl p-5 border-l-4 border-l-emerald-500 flex flex-col gap-3">
         <div class="flex flex-wrap items-center justify-between gap-2">
           <div class="flex items-center gap-2">
-            <span class="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">💡 ALGORITHM KARŞILAŞTIRMASI</span>
+            <span class="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">💡 ALGORITHM COMPARISON</span>
             <span id="report-coords" class="text-xs font-mono text-slate-500">—</span>
             <span id="report-area" class="text-xs font-mono font-semibold text-amber-800 bg-amber-100 px-2 py-0.5 rounded">—</span>
           </div>
-          <h2 id="report-title" class="text-xs font-semibold text-slate-600">Analiz bekleniyor</h2>
+          <h2 id="report-title" class="text-xs font-semibold text-slate-600">Awaiting analysis</h2>
         </div>
 
         <p id="decision-hero-sentence" class="text-sm sm:text-base font-medium text-slate-900 leading-relaxed"></p>
         <div id="traffic-light-badges" class="flex flex-wrap items-center gap-2 pt-1"></div>
       </div>
 
-      <!-- 3 ANA SEKME (TAB) MENÜSÜ -->
+      <!-- 4 MAIN TABS MENU -->
       <div class="flex flex-wrap gap-2 bg-white/80 p-1.5 rounded-2xl border border-sky-200 shadow-xs">
         <button type="button" data-tab="tab-rotation" class="tab-btn flex-1 min-w-[160px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition cursor-pointer bg-emerald-500 text-white shadow-xs">
-          1. Rotasyon Karşılaştırması
+          1. Rotation Comparison
         </button>
         <button type="button" data-tab="tab-tasks" data-i18n="tab_2" class="tab-btn flex-1 min-w-[160px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:bg-sky-50 transition cursor-pointer">
-          2. Hava Durumu & Görevler
+          2. Weather &amp; Tasks
         </button>
         <button type="button" data-tab="tab-simulation" data-i18n="tab_3" class="tab-btn flex-1 min-w-[160px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:bg-sky-50 transition cursor-pointer">
-          3. Senaryo Testi & Grafikler
+          3. Scenario Lab &amp; Charts
         </button>
         <button type="button" data-tab="tab-farm-simulation" class="tab-btn flex-1 min-w-[160px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 hover:bg-sky-50 transition cursor-pointer">
-          4. Tarım Simülasyonu
+          4. Farm Simulation
         </button>
       </div>
 
-      <!-- SEKME 1: ROTASYON STRATEJİLERİ & EKİM TAKVİMİ -->
+      <!-- TAB 1: ROTATION STRATEGIES & PLANTING CALENDAR -->
       <div id="tab-rotation" class="tab-pane flex flex-col gap-5">
         <div class="glass-panel rounded-2xl p-5 flex flex-col gap-4">
           <div class="flex flex-wrap items-center justify-between gap-2 border-b border-sky-100 pb-3">
             <div>
-              <h3 data-i18n="rot_title" class="text-base font-bold text-slate-900">Rotasyon Seçenekleri</h3>
-              <p class="text-xs text-slate-500">Algorithm motorunun ürettiği seçenekleri ve ürün sıralarını karşılaştırın.</p>
+              <h3 data-i18n="rot_title" class="text-base font-bold text-slate-900">Rotation Strategies Comparison</h3>
+              <p class="text-xs text-slate-500">Compare the options and crop sequences generated by the algorithm engine.</p>
             </div>
           </div>
 
@@ -348,12 +335,12 @@
         <div id="planting-timeline-box" class="glass-panel rounded-2xl p-5 flex flex-col gap-4"></div>
       </div>
 
-      <!-- SEKME 2: HAVA TAHMİNİ & ÇİFTÇİ GÖREV TAKVİMİ -->
+      <!-- TAB 2: WEATHER FORECAST & FARMER TASK CALENDAR -->
       <div id="tab-tasks" class="tab-pane hidden flex-col gap-5">
         <div id="farmer-task-calendar-box" class="glass-panel rounded-2xl p-5 flex flex-col gap-4"></div>
       </div>
 
-      <!-- SEKME 3: CANLI SİMÜLASYON & GRAFİKLER -->
+      <!-- TAB 3: LIVE SIMULATION & CHARTS -->
       <div id="tab-simulation" class="tab-pane hidden flex-col gap-5">
         <div id="simulation-panel-box" class="glass-panel rounded-2xl p-5 border-t-2 border-t-amber-400"></div>
         <p id="chart-data-status" role="status" class="text-xs text-slate-600"></p>
@@ -361,16 +348,16 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="glass-panel rounded-2xl p-4 flex flex-col gap-3">
             <div>
-              <h3 data-i18n="chart1_title" class="text-xs font-bold uppercase tracking-wider text-slate-900">Aylık Yağış & Sıcaklık Trendi</h3>
-              <p data-i18n="chart1_sub" class="text-[11px] text-slate-500">Mevcut tahmin ayları ve ayrı geçmiş referansı</p>
+              <h3 data-i18n="chart1_title" class="text-xs font-bold uppercase tracking-wider text-slate-900">Monthly Rainfall &amp; Temperature Trend</h3>
+              <p data-i18n="chart1_sub" class="text-[11px] text-slate-500">Available forecast months and separate historical baseline</p>
             </div>
             <div class="relative h-56 w-full"><canvas id="tempRainChart"></canvas></div>
           </div>
 
           <div class="glass-panel rounded-2xl p-4 flex flex-col gap-3">
             <div>
-              <h3 data-i18n="chart2_title" class="text-xs font-bold uppercase tracking-wider text-slate-900">Geçmişe Göre Sıcaklık Farkı</h3>
-              <p data-i18n="chart2_sub" class="text-[11px] text-slate-500">GEOS-S2S − POWER (°C), kalibrasyonsuz karşılaştırma</p>
+              <h3 data-i18n="chart2_title" class="text-xs font-bold uppercase tracking-wider text-slate-900">Temperature Difference from Historical Baseline</h3>
+              <p data-i18n="chart2_sub" class="text-[11px] text-slate-500">GEOS-S2S − POWER (°C), uncalibrated comparison</p>
             </div>
             <div class="relative h-56 w-full"><canvas id="riskIndexChart"></canvas></div>
           </div>
@@ -378,7 +365,7 @@
 
         <details class="glass-panel rounded-2xl p-4 cursor-pointer">
           <summary class="text-xs font-bold text-slate-700 select-none">
-            🔬 Kaynaklar, Senaryo ve Veri Sınırlamaları
+            🔬 Data Sources, Scenario &amp; Model Limitations
           </summary>
           <div id="agronomy-alerts-list" class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3 pt-3 border-t border-sky-100"></div>
         </details>
@@ -386,7 +373,7 @@
 
       <div id="tab-farm-simulation" class="tab-pane hidden flex-col gap-5">
         <div id="farm-simulation-root" class="glass-panel rounded-2xl p-5 farm-simulation">
-          <p>Tarım simülasyonu için konum analizi bekleniyor.</p>
+          <p>Awaiting location analysis for farm simulation.</p>
         </div>
       </div>
     </section>
@@ -396,6 +383,6 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
   <script src="/api/config.js"></script>
-  <script type="module" src="js/main.js"></script>
+  <script type="module" src="js/main.js?v=en2"></script>
 </body>
 </html>

@@ -22,7 +22,7 @@ export const API_CONFIG = {
 
 export function mapPayloadToAlgorithm(payload) {
   const crop = payload.cropAndResources.targetCrop;
-  if (!crop) throw new Error('Algorithm kataloğundan bir ürün seçin.');
+  if (!crop) throw new Error('Select a crop from the algorithm catalog.');
   return {
     location: { latitude: payload.location.latitude, longitude: payload.location.longitude },
     climateSummary: {},
@@ -43,9 +43,35 @@ export function mapPayloadToAlgorithm(payload) {
   };
 }
 
+function translateLegacyTasksToEnglish(weatherResponse) {
+  if (!weatherResponse || !Array.isArray(weatherResponse.taskCalendar)) return weatherResponse;
+  return {
+    ...weatherResponse,
+    taskCalendar: weatherResponse.taskCalendar.map(item => {
+      if (!item || typeof item !== 'object') return item;
+      const typeMap = { UYARI: 'WARNING', 'BİLGİ': 'INFO', PLANLAMA: 'PLANNING' };
+      let task = item.task || item.title || '';
+      let reason = item.reason || item.description || '';
+      if (task === 'Düşük sıcaklık için saha kontrolü') task = 'Field inspection for low temperature';
+      if (task === 'Yağış öncesi saha planını kontrol edin') task = 'Review field schedule before rainfall';
+      if (task === 'Toprak tavı ve ekim/gübreleme penceresi kontrolü') task = 'Check soil moisture and sowing/fertilizer window';
+      reason = reason
+        .replace(/^Tahmini en düşük sıcaklık\s*/i, 'Forecast minimum temperature ')
+        .replace(/^Tahmini günlük toplam yağış\s*/i, 'Forecast daily total precipitation ')
+        .replace(/Yağışsız ve ılıman hava \(([0-9.,]+)\s*°C\); saha işlemleri için uygun pencere\./i, 'Dry and mild weather ($1 °C); suitable window for field operations.');
+      return {
+        ...item,
+        type: typeMap[item.type] || item.type,
+        task,
+        reason
+      };
+    })
+  };
+}
+
 async function requestJson(endpoint, body) {
   if (isBackendOffline()) {
-    throw new Error('Yerel sunucu çevrimdışı; tarayıcı motoru kullanılıyor.');
+    throw new Error('Local server offline; using browser engine.');
   }
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.TIMEOUT_MS);
@@ -61,7 +87,7 @@ async function requestJson(endpoint, body) {
     return data;
   } catch (error) {
     if (isBrowser) markBackendOffline();
-    if (error.name === 'AbortError') throw new Error('Veri servisi zamanında yanıt vermedi.');
+    if (error.name === 'AbortError') throw new Error('Data service did not respond in time.');
     throw error;
   } finally {
     clearTimeout(timeoutId);
@@ -69,19 +95,15 @@ async function requestJson(endpoint, body) {
 }
 
 export async function fetchCatalog() {
-  try {
-    const metadata = await requestJson(API_CONFIG.ENDPOINTS.CATALOG);
-    if (!Array.isArray(metadata.crops) || metadata.crops.length === 0 ||
-        !Array.isArray(metadata.forecastMonths) || metadata.forecastMonths.length === 0) {
-      throw new Error('Algorithm ürün kataloğu veya tahmin kapsamı boş.');
-    }
-    return metadata;
-  } catch (error) {
-    if (isBrowser) {
-      return getLocalCatalog();
-    }
-    throw error;
+  if (isBrowser) {
+    return getLocalCatalog();
   }
+  const metadata = await requestJson(API_CONFIG.ENDPOINTS.CATALOG);
+  if (!Array.isArray(metadata.crops) || metadata.crops.length === 0 ||
+      !Array.isArray(metadata.forecastMonths) || metadata.forecastMonths.length === 0) {
+    throw new Error('Algorithm crop catalog or forecast scope is empty.');
+  }
+  return metadata;
 }
 
 export async function fetchAllBackendData(payload, { onlySimulation = false, cachedData = null, metadata = null } = {}) {
@@ -90,41 +112,41 @@ export async function fetchAllBackendData(payload, { onlySimulation = false, cac
     cachedData?.data?.payload?.location?.longitude === payload.location.longitude;
   const reuseWeather = onlySimulation && sameLocation && cachedData?.rawWeather;
   const [predictionResult, weatherResult] = await Promise.allSettled([
-    requestJson(API_CONFIG.ENDPOINTS.SIMULATE_ROTATION, contract).then(response => {
-      if (!Array.isArray(response.simulationResult?.monthlyForecasts) ||
-          !Array.isArray(response.simulationResult?.rotationStrategies)) {
-        throw new Error('Algorithm yanıtında aylık tahmin veya rotasyon verisi eksik.');
-      }
-      if (isBrowser && response.simulationResult?.climateSummary?.usedInRotationScoring === false) {
-        return assessLocal(contract);
-      }
-      return response.simulationResult;
-    }).catch(error => {
-      if (isBrowser) {
-        return assessLocal(contract);
-      }
-      throw error;
-    }),
+    isBrowser
+      ? Promise.resolve().then(() => assessLocal(contract))
+      : requestJson(API_CONFIG.ENDPOINTS.SIMULATE_ROTATION, contract).then(response => {
+          if (!Array.isArray(response.simulationResult?.monthlyForecasts) ||
+              !Array.isArray(response.simulationResult?.rotationStrategies)) {
+            throw new Error('Monthly forecast or rotation data missing in algorithm response.');
+          }
+          return response.simulationResult;
+        }),
     reuseWeather ? Promise.resolve(cachedData.rawWeather) :
-      requestJson(API_CONFIG.ENDPOINTS.WEATHER_TASKS, {
-        lat: payload.location.latitude, lng: payload.location.longitude
-      }).then(response => {
-        if (!Array.isArray(response.forecast14Days) || response.forecast14Days.length === 0) {
-          throw new Error('Günlük hava yanıtında tahmin bulunamadı.');
-        }
-        return response;
-      }).catch(error => {
-        if (isBrowser) {
-          return fetchBrowserWeatherAndTasks(payload.location.latitude, payload.location.longitude, payload);
-        }
-        throw error;
-      })
+      isBrowser
+        ? fetchBrowserWeatherAndTasks(payload.location.latitude, payload.location.longitude, payload).catch(() =>
+            requestJson(API_CONFIG.ENDPOINTS.WEATHER_TASKS, {
+              lat: payload.location.latitude, lng: payload.location.longitude
+            }).then(response => {
+              if (!Array.isArray(response.forecast14Days) || response.forecast14Days.length === 0) {
+                throw new Error('No forecast found in daily weather response.');
+              }
+              return translateLegacyTasksToEnglish(response);
+            })
+          )
+        : requestJson(API_CONFIG.ENDPOINTS.WEATHER_TASKS, {
+            lat: payload.location.latitude, lng: payload.location.longitude
+          }).then(response => {
+            if (!Array.isArray(response.forecast14Days) || response.forecast14Days.length === 0) {
+              throw new Error('No forecast found in daily weather response.');
+            }
+            return translateLegacyTasksToEnglish(response);
+          })
   ]);
   const prediction = predictionResult.status === 'fulfilled' ? predictionResult.value : null;
   const weather = weatherResult.status === 'fulfilled' ? weatherResult.value : null;
   const errors = [];
-  if (!prediction) errors.push(`Algorithm: ${predictionResult.reason?.message || 'Veri alınamadı'}`);
-  if (!weather) errors.push(`Günlük hava: ${weatherResult.reason?.message || 'Veri alınamadı'}`);
+  if (!prediction) errors.push(`Algorithm: ${predictionResult.reason?.message || 'Data unavailable'}`);
+  if (!weather) errors.push(`Daily weather: ${weatherResult.reason?.message || 'Data unavailable'}`);
   return {
     status: prediction && weather ? 'live' : prediction || weather ? 'partial' : 'error',
     algorithmAvailable: Boolean(prediction), weatherAvailable: Boolean(weather),

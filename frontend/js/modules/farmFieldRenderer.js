@@ -180,7 +180,7 @@ export class FarmFieldRenderer {
     ctx.save(); ctx.translate(42, 85); ctx.scale(.55, .55); plant(ctx, crop, 70, 1, 0, 0); ctx.restore();
     ctx.fillStyle = '#234837'; ctx.font = '600 13px system-ui'; ctx.fillText(name, 76, 43);
     ctx.font = '10px system-ui';
-    if (width < 450) { ctx.fillText('Ürün görseli', 76, 62); ctx.fillText('Temsili animasyon', 76, 76); }
-    else ctx.fillText('Ürün görseli · Temsili animasyon', 76, 62);
+    if (width < 450) { ctx.fillText('Crop visual', 76, 62); ctx.fillText('Illustrative animation', 76, 76); }
+    else ctx.fillText('Crop visual · Illustrative animation', 76, 62);
   }
 }
